@@ -291,3 +291,17 @@ export class TeddyCard extends LitElement {
 }
 
 customElements.define('teddy-card', TeddyCard);
+
+// Register with HACS
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: 'teddy-card',
+  name: 'TeddyCloud Toniebox Card',
+  description: 'A custom card for displaying TeddyCloud Toniebox information',
+  version: CARD_VERSION
+});
+
+console.info('%c TEDDY-CARD %c Card registered successfully', 
+  'color: white; font-weight: bold; background: #03a9f4',
+  'color: white; font-weight: bold; background: #4caf50'
+);

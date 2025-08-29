@@ -6,6 +6,20 @@
 
 A custom Home Assistant card for displaying TeddyCloud Toniebox information with configurable parameters and multi-language support (English/German).
 
+## Screenshots
+
+### Card Overview
+![TeddyCloud Card](https://via.placeholder.com/600x400/03a9f4/ffffff?text=TeddyCloud+Toniebox+Card)
+*Example of the TeddyCloud Toniebox Card showing content, status, and controls*
+
+### Visual Editor  
+![Visual Editor](https://via.placeholder.com/600x300/4caf50/ffffff?text=Visual+Editor)
+*Easy configuration through the Home Assistant dashboard editor*
+
+### Mobile View
+![Mobile Responsive](https://via.placeholder.com/300x600/ff9800/ffffff?text=Mobile+View)
+*Responsive design that works perfectly on mobile devices*
+
 This card integrates with the [TeddyCloud Add-on](https://github.com/mrueg/addon-teddycloud) to provide a comprehensive overview of your Toniebox status, content, and server settings.
 
 ## Features
