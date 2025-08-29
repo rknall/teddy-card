@@ -1,9 +1,9 @@
 import { LitElement, html, css } from 'lit';
 import { localize } from './localize.js';
-import { validateTonieboxEntities, extractBoxIdFromEntity, getExpectedEntities, extractDeviceName } from './utils.js';
+import { validateTonieboxEntities, extractBoxIdFromEntity, getExpectedEntities, extractDeviceName, createConfigFromDevice, validateDeviceConfiguration } from './utils.js';
 import './editor.js';
 
-const CARD_VERSION = '1.1.0';
+const CARD_VERSION = '1.2.0';
 
 console.info(
   `%c TEDDY-CARD %c v${CARD_VERSION} `,
@@ -25,6 +25,7 @@ export class TeddyCard extends LitElement {
     // Update auto-detected name when hass changes
     if (changedProperties.has('hass')) {
       this._updateAutoDetectedName();
+      this._updateDeviceConfiguration();
     }
   }
 
@@ -50,6 +51,11 @@ export class TeddyCard extends LitElement {
       normalizedConfig.selection_mode = 'auto';
     }
     
+    // If we have device_source but no selection_mode, set to device
+    if (normalizedConfig.device_source && !normalizedConfig.selection_mode) {
+      normalizedConfig.selection_mode = 'device';
+    }
+    
     // If no selection_mode specified, default to manual for backward compatibility
     if (!normalizedConfig.selection_mode) {
       normalizedConfig.selection_mode = 'manual';
@@ -62,6 +68,12 @@ export class TeddyCard extends LitElement {
         normalizedConfig.toniebox_id = boxId;
         // Name will be set when hass is available
       }
+    }
+    
+    // Handle device mode - extract IDs from device_source
+    if (normalizedConfig.selection_mode === 'device' && normalizedConfig.device_source) {
+      // Device ID and name will be set when hass is available
+      this._updateDeviceConfiguration(normalizedConfig);
     }
     
     // Validate based on mode
@@ -78,6 +90,10 @@ export class TeddyCard extends LitElement {
       }
       if (!normalizedConfig.toniebox_id) {
         throw new Error('Could not extract Toniebox ID from selected entity');
+      }
+    } else if (normalizedConfig.selection_mode === 'device') {
+      if (!normalizedConfig.device_source) {
+        throw new Error('Device source is required for device mode');
       }
     }
     
@@ -100,6 +116,26 @@ export class TeddyCard extends LitElement {
           this.config = { ...this.config, toniebox_name: name };
           this.requestUpdate();
         }
+      }
+    }
+  }
+  
+  _updateDeviceConfiguration(configOverride = null) {
+    const config = configOverride || this.config;
+    if (this.hass && config?.selection_mode === 'device' && config?.device_source) {
+      try {
+        const deviceConfig = createConfigFromDevice(this.hass, config.device_source);
+        if (!config.toniebox_id || !config.toniebox_name) {
+          const updatedConfig = { ...config, ...deviceConfig };
+          if (configOverride) {
+            Object.assign(configOverride, deviceConfig);
+          } else {
+            this.config = updatedConfig;
+            this.requestUpdate();
+          }
+        }
+      } catch (error) {
+        console.warn('Could not update device configuration:', error);
       }
     }
   }

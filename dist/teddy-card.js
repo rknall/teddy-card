@@ -3,151 +3,229 @@
  * Copyright 2019 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const t=globalThis,e=t.ShadowRoot&&(void 0===t.ShadyCSS||t.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,i=Symbol(),o=new WeakMap;let n=class{constructor(t,e,o){if(this._$cssResult$=!0,o!==i)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const i=this.t;if(e&&void 0===t){const e=void 0!==i&&1===i.length;e&&(t=o.get(i)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),e&&o.set(i,t))}return t}toString(){return this.cssText}};const s=(t,...e)=>{const o=1===t.length?t[0]:e.reduce((e,i,o)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+t[o+1],t[0]);return new n(o,t,i)},r=e?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const i of t.cssRules)e+=i.cssText;return(t=>new n("string"==typeof t?t:t+"",void 0,i))(e)})(t):t,{is:a,defineProperty:l,getOwnPropertyDescriptor:c,getOwnPropertyNames:d,getOwnPropertySymbols:h,getPrototypeOf:u}=Object,_=globalThis,g=_.trustedTypes,p=g?g.emptyScript:"",m=_.reactiveElementPolyfillSupport,f=(t,e)=>t,v={toAttribute(t,e){switch(e){case Boolean:t=t?p:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let i=t;switch(e){case Boolean:i=null!==t;break;case Number:i=null===t?null:Number(t);break;case Object:case Array:try{i=JSON.parse(t)}catch(t){i=null}}return i}},y=(t,e)=>!a(t,e),$={attribute:!0,type:String,converter:v,reflect:!1,useDefault:!1,hasChanged:y};
+const e=globalThis,t=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,i=Symbol(),o=new WeakMap;let n=class{constructor(e,t,o){if(this._$cssResult$=!0,o!==i)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o;const i=this.t;if(t&&void 0===e){const t=void 0!==i&&1===i.length;t&&(e=o.get(i)),void 0===e&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),t&&o.set(i,e))}return e}toString(){return this.cssText}};const s=(e,...t)=>{const o=1===e.length?e[0]:t.reduce((t,i,o)=>t+(e=>{if(!0===e._$cssResult$)return e.cssText;if("number"==typeof e)return e;throw Error("Value passed to 'css' function must be a 'css' function result: "+e+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+e[o+1],e[0]);return new n(o,e,i)},r=t?e=>e:e=>e instanceof CSSStyleSheet?(e=>{let t="";for(const i of e.cssRules)t+=i.cssText;return(e=>new n("string"==typeof e?e:e+"",void 0,i))(t)})(e):e,{is:a,defineProperty:c,getOwnPropertyDescriptor:d,getOwnPropertyNames:l,getOwnPropertySymbols:h,getPrototypeOf:u}=Object,_=globalThis,g=_.trustedTypes,p=g?g.emptyScript:"",v=_.reactiveElementPolyfillSupport,f=(e,t)=>e,m={toAttribute(e,t){switch(t){case Boolean:e=e?p:null;break;case Object:case Array:e=null==e?e:JSON.stringify(e)}return e},fromAttribute(e,t){let i=e;switch(t){case Boolean:i=null!==e;break;case Number:i=null===e?null:Number(e);break;case Object:case Array:try{i=JSON.parse(e)}catch(e){i=null}}return i}},y=(e,t)=>!a(e,t),b={attribute:!0,type:String,converter:m,reflect:!1,useDefault:!1,hasChanged:y};
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
- */Symbol.metadata??=Symbol("metadata"),_.litPropertyMetadata??=new WeakMap;let b=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=$){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const i=Symbol(),o=this.getPropertyDescriptor(t,i,e);void 0!==o&&l(this.prototype,t,o)}}static getPropertyDescriptor(t,e,i){const{get:o,set:n}=c(this.prototype,t)??{get(){return this[e]},set(t){this[e]=t}};return{get:o,set(e){const s=o?.call(this);n?.call(this,e),this.requestUpdate(t,s,i)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??$}static _$Ei(){if(this.hasOwnProperty(f("elementProperties")))return;const t=u(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(f("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(f("properties"))){const t=this.properties,e=[...d(t),...h(t)];for(const i of e)this.createProperty(i,t[i])}const t=this[Symbol.metadata];if(null!==t){const e=litPropertyMetadata.get(t);if(void 0!==e)for(const[t,i]of e)this.elementProperties.set(t,i)}this._$Eh=new Map;for(const[t,e]of this.elementProperties){const i=this._$Eu(t,e);void 0!==i&&this._$Eh.set(i,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const i=new Set(t.flat(1/0).reverse());for(const t of i)e.unshift(r(t))}else void 0!==t&&e.push(r(t));return e}static _$Eu(t,e){const i=e.attribute;return!1===i?void 0:"string"==typeof i?i:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=new Map,e=this.constructor.elementProperties;for(const i of e.keys())this.hasOwnProperty(i)&&(t.set(i,this[i]),delete this[i]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const i=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((i,o)=>{if(e)i.adoptedStyleSheets=o.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const e of o){const o=document.createElement("style"),n=t.litNonce;void 0!==n&&o.setAttribute("nonce",n),o.textContent=e.cssText,i.appendChild(o)}})(i,this.constructor.elementStyles),i}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,i){this._$AK(t,i)}_$ET(t,e){const i=this.constructor.elementProperties.get(t),o=this.constructor._$Eu(t,i);if(void 0!==o&&!0===i.reflect){const n=(void 0!==i.converter?.toAttribute?i.converter:v).toAttribute(e,i.type);this._$Em=t,null==n?this.removeAttribute(o):this.setAttribute(o,n),this._$Em=null}}_$AK(t,e){const i=this.constructor,o=i._$Eh.get(t);if(void 0!==o&&this._$Em!==o){const t=i.getPropertyOptions(o),n="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:v;this._$Em=o;const s=n.fromAttribute(e,t.type);this[o]=s??this._$Ej?.get(o)??s,this._$Em=null}}requestUpdate(t,e,i){if(void 0!==t){const o=this.constructor,n=this[t];if(i??=o.getPropertyOptions(t),!((i.hasChanged??y)(n,e)||i.useDefault&&i.reflect&&n===this._$Ej?.get(t)&&!this.hasAttribute(o._$Eu(t,i))))return;this.C(t,e,i)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(t,e,{useDefault:i,reflect:o,wrapped:n},s){i&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,s??e??this[t]),!0!==n||void 0!==s)||(this._$AL.has(t)||(this.hasUpdated||i||(e=void 0),this._$AL.set(t,e)),!0===o&&this._$Em!==t&&(this._$Eq??=new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,e]of this._$Ep)this[t]=e;this._$Ep=void 0}const t=this.constructor.elementProperties;if(t.size>0)for(const[e,i]of t){const{wrapped:t}=i,o=this[e];!0!==t||this._$AL.has(e)||void 0===o||this.C(e,void 0,i,o)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(e)):this._$EM()}catch(e){throw t=!1,this._$EM(),e}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(t){}firstUpdated(t){}};b.elementStyles=[],b.shadowRootOptions={mode:"open"},b[f("elementProperties")]=new Map,b[f("finalized")]=new Map,m?.({ReactiveElement:b}),(_.reactiveElementVersions??=[]).push("2.1.1");
+ */Symbol.metadata??=Symbol("metadata"),_.litPropertyMetadata??=new WeakMap;let $=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??=[]).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=b){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){const i=Symbol(),o=this.getPropertyDescriptor(e,i,t);void 0!==o&&c(this.prototype,e,o)}}static getPropertyDescriptor(e,t,i){const{get:o,set:n}=d(this.prototype,e)??{get(){return this[t]},set(e){this[t]=e}};return{get:o,set(t){const s=o?.call(this);n?.call(this,t),this.requestUpdate(e,s,i)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??b}static _$Ei(){if(this.hasOwnProperty(f("elementProperties")))return;const e=u(this);e.finalize(),void 0!==e.l&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(f("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(f("properties"))){const e=this.properties,t=[...l(e),...h(e)];for(const i of t)this.createProperty(i,e[i])}const e=this[Symbol.metadata];if(null!==e){const t=litPropertyMetadata.get(e);if(void 0!==t)for(const[e,i]of t)this.elementProperties.set(e,i)}this._$Eh=new Map;for(const[e,t]of this.elementProperties){const i=this._$Eu(e,t);void 0!==i&&this._$Eh.set(i,e)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){const t=[];if(Array.isArray(e)){const i=new Set(e.flat(1/0).reverse());for(const e of i)t.unshift(r(e))}else void 0!==e&&t.push(r(e));return t}static _$Eu(e,t){const i=t.attribute;return!1===i?void 0:"string"==typeof i?i:"string"==typeof e?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??=new Set).add(e),void 0!==this.renderRoot&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){const e=new Map,t=this.constructor.elementProperties;for(const i of t.keys())this.hasOwnProperty(i)&&(e.set(i,this[i]),delete this[i]);e.size>0&&(this._$Ep=e)}createRenderRoot(){const i=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((i,o)=>{if(t)i.adoptedStyleSheets=o.map(e=>e instanceof CSSStyleSheet?e:e.styleSheet);else for(const t of o){const o=document.createElement("style"),n=e.litNonce;void 0!==n&&o.setAttribute("nonce",n),o.textContent=t.cssText,i.appendChild(o)}})(i,this.constructor.elementStyles),i}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,i){this._$AK(e,i)}_$ET(e,t){const i=this.constructor.elementProperties.get(e),o=this.constructor._$Eu(e,i);if(void 0!==o&&!0===i.reflect){const n=(void 0!==i.converter?.toAttribute?i.converter:m).toAttribute(t,i.type);this._$Em=e,null==n?this.removeAttribute(o):this.setAttribute(o,n),this._$Em=null}}_$AK(e,t){const i=this.constructor,o=i._$Eh.get(e);if(void 0!==o&&this._$Em!==o){const e=i.getPropertyOptions(o),n="function"==typeof e.converter?{fromAttribute:e.converter}:void 0!==e.converter?.fromAttribute?e.converter:m;this._$Em=o;const s=n.fromAttribute(t,e.type);this[o]=s??this._$Ej?.get(o)??s,this._$Em=null}}requestUpdate(e,t,i){if(void 0!==e){const o=this.constructor,n=this[e];if(i??=o.getPropertyOptions(e),!((i.hasChanged??y)(n,t)||i.useDefault&&i.reflect&&n===this._$Ej?.get(e)&&!this.hasAttribute(o._$Eu(e,i))))return;this.C(e,t,i)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(e,t,{useDefault:i,reflect:o,wrapped:n},s){i&&!(this._$Ej??=new Map).has(e)&&(this._$Ej.set(e,s??t??this[e]),!0!==n||void 0!==s)||(this._$AL.has(e)||(this.hasUpdated||i||(t=void 0),this._$AL.set(e,t)),!0===o&&this._$Em!==e&&(this._$Eq??=new Set).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(e){Promise.reject(e)}const e=this.scheduleUpdate();return null!=e&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[e,t]of this._$Ep)this[e]=t;this._$Ep=void 0}const e=this.constructor.elementProperties;if(e.size>0)for(const[t,i]of e){const{wrapped:e}=i,o=this[t];!0!==e||this._$AL.has(t)||void 0===o||this.C(t,void 0,i,o)}}let e=!1;const t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(e=>e.hostUpdate?.()),this.update(t)):this._$EM()}catch(t){throw e=!1,this._$EM(),t}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(e=>e.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&=this._$Eq.forEach(e=>this._$ET(e,this[e])),this._$EM()}updated(e){}firstUpdated(e){}};$.elementStyles=[],$.shadowRootOptions={mode:"open"},$[f("elementProperties")]=new Map,$[f("finalized")]=new Map,v?.({ReactiveElement:$}),(_.reactiveElementVersions??=[]).push("2.1.1");
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const x=globalThis,A=x.trustedTypes,E=A?A.createPolicy("lit-html",{createHTML:t=>t}):void 0,w="$lit$",C=`lit$${Math.random().toFixed(9).slice(2)}$`,S="?"+C,T=`<${S}>`,M=document,k=()=>M.createComment(""),D=t=>null===t||"object"!=typeof t&&"function"!=typeof t,P=Array.isArray,O="[ \t\n\f\r]",U=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,R=/-->/g,I=/>/g,N=RegExp(`>|${O}(?:([^\\s"'>=/]+)(${O}*=${O}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),H=/'/g,z=/"/g,L=/^(?:script|style|textarea|title)$/i,j=(t=>(e,...i)=>({_$litType$:t,strings:e,values:i}))(1),V=Symbol.for("lit-noChange"),B=Symbol.for("lit-nothing"),q=new WeakMap,W=M.createTreeWalker(M,129);function K(t,e){if(!P(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==E?E.createHTML(e):e}const Z=(t,e)=>{const i=t.length-1,o=[];let n,s=2===e?"<svg>":3===e?"<math>":"",r=U;for(let e=0;e<i;e++){const i=t[e];let a,l,c=-1,d=0;for(;d<i.length&&(r.lastIndex=d,l=r.exec(i),null!==l);)d=r.lastIndex,r===U?"!--"===l[1]?r=R:void 0!==l[1]?r=I:void 0!==l[2]?(L.test(l[2])&&(n=RegExp("</"+l[2],"g")),r=N):void 0!==l[3]&&(r=N):r===N?">"===l[0]?(r=n??U,c=-1):void 0===l[1]?c=-2:(c=r.lastIndex-l[2].length,a=l[1],r=void 0===l[3]?N:'"'===l[3]?z:H):r===z||r===H?r=N:r===R||r===I?r=U:(r=N,n=void 0);const h=r===N&&t[e+1].startsWith("/>")?" ":"";s+=r===U?i+T:c>=0?(o.push(a),i.slice(0,c)+w+i.slice(c)+C+h):i+C+(-2===c?e:h)}return[K(t,s+(t[i]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),o]};class F{constructor({strings:t,_$litType$:e},i){let o;this.parts=[];let n=0,s=0;const r=t.length-1,a=this.parts,[l,c]=Z(t,e);if(this.el=F.createElement(l,i),W.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(o=W.nextNode())&&a.length<r;){if(1===o.nodeType){if(o.hasAttributes())for(const t of o.getAttributeNames())if(t.endsWith(w)){const e=c[s++],i=o.getAttribute(t).split(C),r=/([.?@])?(.*)/.exec(e);a.push({type:1,index:n,name:r[2],strings:i,ctor:"."===r[1]?X:"?"===r[1]?tt:"@"===r[1]?et:Q}),o.removeAttribute(t)}else t.startsWith(C)&&(a.push({type:6,index:n}),o.removeAttribute(t));if(L.test(o.tagName)){const t=o.textContent.split(C),e=t.length-1;if(e>0){o.textContent=A?A.emptyScript:"";for(let i=0;i<e;i++)o.append(t[i],k()),W.nextNode(),a.push({type:2,index:++n});o.append(t[e],k())}}}else if(8===o.nodeType)if(o.data===S)a.push({type:2,index:n});else{let t=-1;for(;-1!==(t=o.data.indexOf(C,t+1));)a.push({type:7,index:n}),t+=C.length-1}n++}}static createElement(t,e){const i=M.createElement("template");return i.innerHTML=t,i}}function G(t,e,i=t,o){if(e===V)return e;let n=void 0!==o?i._$Co?.[o]:i._$Cl;const s=D(e)?void 0:e._$litDirective$;return n?.constructor!==s&&(n?._$AO?.(!1),void 0===s?n=void 0:(n=new s(t),n._$AT(t,i,o)),void 0!==o?(i._$Co??=[])[o]=n:i._$Cl=n),void 0!==n&&(e=G(t,n._$AS(t,e.values),n,o)),e}class J{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:i}=this._$AD,o=(t?.creationScope??M).importNode(e,!0);W.currentNode=o;let n=W.nextNode(),s=0,r=0,a=i[0];for(;void 0!==a;){if(s===a.index){let e;2===a.type?e=new Y(n,n.nextSibling,this,t):1===a.type?e=new a.ctor(n,a.name,a.strings,this,t):6===a.type&&(e=new it(n,this,t)),this._$AV.push(e),a=i[++r]}s!==a?.index&&(n=W.nextNode(),s++)}return W.currentNode=M,o}p(t){let e=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(t,i,e),e+=i.strings.length-2):i._$AI(t[e])),e++}}class Y{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,i,o){this.type=2,this._$AH=B,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=i,this.options=o,this._$Cv=o?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=G(this,t,e),D(t)?t===B||null==t||""===t?(this._$AH!==B&&this._$AR(),this._$AH=B):t!==this._$AH&&t!==V&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>P(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==B&&D(this._$AH)?this._$AA.nextSibling.data=t:this.T(M.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:i}=t,o="number"==typeof i?this._$AC(t):(void 0===i.el&&(i.el=F.createElement(K(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===o)this._$AH.p(e);else{const t=new J(o,this),i=t.u(this.options);t.p(e),this.T(i),this._$AH=t}}_$AC(t){let e=q.get(t.strings);return void 0===e&&q.set(t.strings,e=new F(t)),e}k(t){P(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let i,o=0;for(const n of t)o===e.length?e.push(i=new Y(this.O(k()),this.O(k()),this,this.options)):i=e[o],i._$AI(n),o++;o<e.length&&(this._$AR(i&&i._$AB.nextSibling,o),e.length=o)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=t.nextSibling;t.remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class Q{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,i,o,n){this.type=1,this._$AH=B,this._$AN=void 0,this.element=t,this.name=e,this._$AM=o,this.options=n,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=B}_$AI(t,e=this,i,o){const n=this.strings;let s=!1;if(void 0===n)t=G(this,t,e,0),s=!D(t)||t!==this._$AH&&t!==V,s&&(this._$AH=t);else{const o=t;let r,a;for(t=n[0],r=0;r<n.length-1;r++)a=G(this,o[i+r],e,r),a===V&&(a=this._$AH[r]),s||=!D(a)||a!==this._$AH[r],a===B?t=B:t!==B&&(t+=(a??"")+n[r+1]),this._$AH[r]=a}s&&!o&&this.j(t)}j(t){t===B?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class X extends Q{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===B?void 0:t}}class tt extends Q{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==B)}}class et extends Q{constructor(t,e,i,o,n){super(t,e,i,o,n),this.type=5}_$AI(t,e=this){if((t=G(this,t,e,0)??B)===V)return;const i=this._$AH,o=t===B&&i!==B||t.capture!==i.capture||t.once!==i.once||t.passive!==i.passive,n=t!==B&&(i===B||o);o&&this.element.removeEventListener(this.name,this,i),n&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class it{constructor(t,e,i){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(t){G(this,t)}}const ot=x.litHtmlPolyfillSupport;ot?.(F,Y),(x.litHtmlVersions??=[]).push("3.3.1");const nt=globalThis;
+const x=globalThis,w=x.trustedTypes,A=w?w.createPolicy("lit-html",{createHTML:e=>e}):void 0,E="$lit$",C=`lit$${Math.random().toFixed(9).slice(2)}$`,S="?"+C,D=`<${S}>`,T=document,M=()=>T.createComment(""),k=e=>null===e||"object"!=typeof e&&"function"!=typeof e,O=Array.isArray,P="[ \t\n\f\r]",I=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,U=/-->/g,R=/>/g,H=RegExp(`>|${P}(?:([^\\s"'>=/]+)(${P}*=${P}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),N=/'/g,z=/"/g,j=/^(?:script|style|textarea|title)$/i,L=(e=>(t,...i)=>({_$litType$:e,strings:t,values:i}))(1),V=Symbol.for("lit-noChange"),q=Symbol.for("lit-nothing"),B=new WeakMap,G=T.createTreeWalker(T,129);function W(e,t){if(!O(e)||!e.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==A?A.createHTML(t):t}const K=(e,t)=>{const i=e.length-1,o=[];let n,s=2===t?"<svg>":3===t?"<math>":"",r=I;for(let t=0;t<i;t++){const i=e[t];let a,c,d=-1,l=0;for(;l<i.length&&(r.lastIndex=l,c=r.exec(i),null!==c);)l=r.lastIndex,r===I?"!--"===c[1]?r=U:void 0!==c[1]?r=R:void 0!==c[2]?(j.test(c[2])&&(n=RegExp("</"+c[2],"g")),r=H):void 0!==c[3]&&(r=H):r===H?">"===c[0]?(r=n??I,d=-1):void 0===c[1]?d=-2:(d=r.lastIndex-c[2].length,a=c[1],r=void 0===c[3]?H:'"'===c[3]?z:N):r===z||r===N?r=H:r===U||r===R?r=I:(r=H,n=void 0);const h=r===H&&e[t+1].startsWith("/>")?" ":"";s+=r===I?i+D:d>=0?(o.push(a),i.slice(0,d)+E+i.slice(d)+C+h):i+C+(-2===d?t:h)}return[W(e,s+(e[i]||"<?>")+(2===t?"</svg>":3===t?"</math>":"")),o]};class Z{constructor({strings:e,_$litType$:t},i){let o;this.parts=[];let n=0,s=0;const r=e.length-1,a=this.parts,[c,d]=K(e,t);if(this.el=Z.createElement(c,i),G.currentNode=this.el.content,2===t||3===t){const e=this.el.content.firstChild;e.replaceWith(...e.childNodes)}for(;null!==(o=G.nextNode())&&a.length<r;){if(1===o.nodeType){if(o.hasAttributes())for(const e of o.getAttributeNames())if(e.endsWith(E)){const t=d[s++],i=o.getAttribute(e).split(C),r=/([.?@])?(.*)/.exec(t);a.push({type:1,index:n,name:r[2],strings:i,ctor:"."===r[1]?X:"?"===r[1]?ee:"@"===r[1]?te:Q}),o.removeAttribute(e)}else e.startsWith(C)&&(a.push({type:6,index:n}),o.removeAttribute(e));if(j.test(o.tagName)){const e=o.textContent.split(C),t=e.length-1;if(t>0){o.textContent=w?w.emptyScript:"";for(let i=0;i<t;i++)o.append(e[i],M()),G.nextNode(),a.push({type:2,index:++n});o.append(e[t],M())}}}else if(8===o.nodeType)if(o.data===S)a.push({type:2,index:n});else{let e=-1;for(;-1!==(e=o.data.indexOf(C,e+1));)a.push({type:7,index:n}),e+=C.length-1}n++}}static createElement(e,t){const i=T.createElement("template");return i.innerHTML=e,i}}function F(e,t,i=e,o){if(t===V)return t;let n=void 0!==o?i._$Co?.[o]:i._$Cl;const s=k(t)?void 0:t._$litDirective$;return n?.constructor!==s&&(n?._$AO?.(!1),void 0===s?n=void 0:(n=new s(e),n._$AT(e,i,o)),void 0!==o?(i._$Co??=[])[o]=n:i._$Cl=n),void 0!==n&&(t=F(e,n._$AS(e,t.values),n,o)),t}class J{constructor(e,t){this._$AV=[],this._$AN=void 0,this._$AD=e,this._$AM=t}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(e){const{el:{content:t},parts:i}=this._$AD,o=(e?.creationScope??T).importNode(t,!0);G.currentNode=o;let n=G.nextNode(),s=0,r=0,a=i[0];for(;void 0!==a;){if(s===a.index){let t;2===a.type?t=new Y(n,n.nextSibling,this,e):1===a.type?t=new a.ctor(n,a.name,a.strings,this,e):6===a.type&&(t=new ie(n,this,e)),this._$AV.push(t),a=i[++r]}s!==a?.index&&(n=G.nextNode(),s++)}return G.currentNode=T,o}p(e){let t=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(e,i,t),t+=i.strings.length-2):i._$AI(e[t])),t++}}class Y{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(e,t,i,o){this.type=2,this._$AH=q,this._$AN=void 0,this._$AA=e,this._$AB=t,this._$AM=i,this.options=o,this._$Cv=o?.isConnected??!0}get parentNode(){let e=this._$AA.parentNode;const t=this._$AM;return void 0!==t&&11===e?.nodeType&&(e=t.parentNode),e}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(e,t=this){e=F(this,e,t),k(e)?e===q||null==e||""===e?(this._$AH!==q&&this._$AR(),this._$AH=q):e!==this._$AH&&e!==V&&this._(e):void 0!==e._$litType$?this.$(e):void 0!==e.nodeType?this.T(e):(e=>O(e)||"function"==typeof e?.[Symbol.iterator])(e)?this.k(e):this._(e)}O(e){return this._$AA.parentNode.insertBefore(e,this._$AB)}T(e){this._$AH!==e&&(this._$AR(),this._$AH=this.O(e))}_(e){this._$AH!==q&&k(this._$AH)?this._$AA.nextSibling.data=e:this.T(T.createTextNode(e)),this._$AH=e}$(e){const{values:t,_$litType$:i}=e,o="number"==typeof i?this._$AC(e):(void 0===i.el&&(i.el=Z.createElement(W(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===o)this._$AH.p(t);else{const e=new J(o,this),i=e.u(this.options);e.p(t),this.T(i),this._$AH=e}}_$AC(e){let t=B.get(e.strings);return void 0===t&&B.set(e.strings,t=new Z(e)),t}k(e){O(this._$AH)||(this._$AH=[],this._$AR());const t=this._$AH;let i,o=0;for(const n of e)o===t.length?t.push(i=new Y(this.O(M()),this.O(M()),this,this.options)):i=t[o],i._$AI(n),o++;o<t.length&&(this._$AR(i&&i._$AB.nextSibling,o),t.length=o)}_$AR(e=this._$AA.nextSibling,t){for(this._$AP?.(!1,!0,t);e!==this._$AB;){const t=e.nextSibling;e.remove(),e=t}}setConnected(e){void 0===this._$AM&&(this._$Cv=e,this._$AP?.(e))}}class Q{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(e,t,i,o,n){this.type=1,this._$AH=q,this._$AN=void 0,this.element=e,this.name=t,this._$AM=o,this.options=n,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=q}_$AI(e,t=this,i,o){const n=this.strings;let s=!1;if(void 0===n)e=F(this,e,t,0),s=!k(e)||e!==this._$AH&&e!==V,s&&(this._$AH=e);else{const o=e;let r,a;for(e=n[0],r=0;r<n.length-1;r++)a=F(this,o[i+r],t,r),a===V&&(a=this._$AH[r]),s||=!k(a)||a!==this._$AH[r],a===q?e=q:e!==q&&(e+=(a??"")+n[r+1]),this._$AH[r]=a}s&&!o&&this.j(e)}j(e){e===q?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,e??"")}}class X extends Q{constructor(){super(...arguments),this.type=3}j(e){this.element[this.name]=e===q?void 0:e}}class ee extends Q{constructor(){super(...arguments),this.type=4}j(e){this.element.toggleAttribute(this.name,!!e&&e!==q)}}class te extends Q{constructor(e,t,i,o,n){super(e,t,i,o,n),this.type=5}_$AI(e,t=this){if((e=F(this,e,t,0)??q)===V)return;const i=this._$AH,o=e===q&&i!==q||e.capture!==i.capture||e.once!==i.once||e.passive!==i.passive,n=e!==q&&(i===q||o);o&&this.element.removeEventListener(this.name,this,i),n&&this.element.addEventListener(this.name,this,e),this._$AH=e}handleEvent(e){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,e):this._$AH.handleEvent(e)}}class ie{constructor(e,t,i){this.element=e,this.type=6,this._$AN=void 0,this._$AM=t,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(e){F(this,e)}}const oe=x.litHtmlPolyfillSupport;oe?.(Z,Y),(x.litHtmlVersions??=[]).push("3.3.1");const ne=globalThis;
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
- */class st extends b{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=((t,e,i)=>{const o=i?.renderBefore??e;let n=o._$litPart$;if(void 0===n){const t=i?.renderBefore??null;o._$litPart$=n=new Y(e.insertBefore(k(),t),t,void 0,i??{})}return n._$AI(t),n})(e,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return V}}st._$litElement$=!0,st.finalized=!0,nt.litElementHydrateSupport?.({LitElement:st});const rt=nt.litElementPolyfillSupport;rt?.({LitElement:st}),(nt.litElementVersions??=[]).push("4.2.1");const at={en:{title:"Title",tag_uid:"Tag UID",charging_station:"Charging Station",volume_db:"Volume dB",volume_level:"Volume Level",small_ear_quieter:"Small Ear (quieter)",big_ear_louder:"Big Ear (louder)",content_audio_id:"Content Audio ID",cache_cloud_content:"Cache Cloud Content",enable_cloud_operation:"Enable Cloud Operation",config:{toniebox_id:"Toniebox ID",toniebox_name:"Toniebox Name",language:"Language",selection_mode:"Configuration Mode",entity_source:"Select Toniebox Entity",toniebox_id_description:"The ID of your Toniebox (used in entity names)",toniebox_name_description:"Display name for your Toniebox",language_description:"Language for the card interface",selection_mode_description:"Choose how to configure your Toniebox",entity_source_description:"Select any entity from your Toniebox to auto-configure",mode_auto:"Auto-detect from entity",mode_manual:"Manual configuration",no_devices_found:"No TeddyCloud devices found",devices_found:"Found {count} TeddyCloud device(s)",entity_validation:"Entity Validation",entities_missing:"{count} of {total} entities missing",entities_all_found:"All entities found",switch_to_auto:"Switch to auto-detection",switch_to_manual:"Switch to manual setup"},errors:{missing_toniebox_id:"Toniebox ID is required",missing_toniebox_name:"Toniebox Name is required",entity_not_found:"Entity not found"}},de:{title:"Titel",tag_uid:"Tag UID",charging_station:"Ladestation",volume_db:"Lautstärke dB",volume_level:"Lautstärke Level",small_ear_quieter:"kleines Ohr (leiser)",big_ear_louder:"großes Ohr (lauter)",content_audio_id:"Content Audio ID",cache_cloud_content:"Cloud-Inhalte zwischenspeichern",enable_cloud_operation:"Cloud-Betrieb aktivieren",config:{toniebox_id:"Toniebox ID",toniebox_name:"Toniebox Name",language:"Sprache",selection_mode:"Konfigurationsmodus",entity_source:"Toniebox Entity auswählen",toniebox_id_description:"Die ID Ihrer Toniebox (wird in Entity-Namen verwendet)",toniebox_name_description:"Anzeigename für Ihre Toniebox",language_description:"Sprache für die Karten-Oberfläche",selection_mode_description:"Wählen Sie, wie Sie Ihre Toniebox konfigurieren möchten",entity_source_description:"Wählen Sie eine Entity Ihrer Toniebox zur automatischen Konfiguration",mode_auto:"Automatische Erkennung von Entity",mode_manual:"Manuelle Konfiguration",no_devices_found:"Keine TeddyCloud Geräte gefunden",devices_found:"{count} TeddyCloud Gerät(e) gefunden",entity_validation:"Entity Validierung",entities_missing:"{count} von {total} Entities fehlen",entities_all_found:"Alle Entities gefunden",switch_to_auto:"Zur automatischen Erkennung wechseln",switch_to_manual:"Zur manuellen Einrichtung wechseln"},errors:{missing_toniebox_id:"Toniebox ID ist erforderlich",missing_toniebox_name:"Toniebox Name ist erforderlich",entity_not_found:"Entity nicht gefunden"}}};function lt(t,e="en",i={}){const o=t.split(".");let n=at[e]||at.en;for(const t of o)n=n?.[t];if(!n)return t;let s=n;return Object.entries(i).forEach(([t,e])=>{s=s.replace(new RegExp(`\\{${t}\\}`,"g"),e)}),s}function ct(t){if(!t||"string"!=typeof t)return null;const e=t.match(/teddycloud_box_([^_]+)_/);return e?e[1]:null}function dt(t){return t&&t.includes("teddycloud_box_")}function ht(t,e){if(!t?.attributes)return`Toniebox ${e}`;const i=t.attributes.friendly_name,o=t.attributes.name,n=t.attributes.device_name;return i?i.replace(/^TeddyCloud Box \w+ /,"").replace(/^Toniebox /,"").replace(/^Box /,"")||`Toniebox ${e}`:n||(o||`Toniebox ${e}`)}function ut(t){return{contentPicture:`image.teddycloud_box_${t}_content_picture`,contentTitle:`sensor.teddycloud_box_${t}_content_title`,tagValid:`sensor.teddycloud_box_${t}_tag_valid`,volumeDb:`sensor.teddycloud_box_${t}_volume_db`,volumeLevel:`sensor.teddycloud_box_${t}_volume_level`,contentAudioId:`sensor.teddycloud_box_${t}_content_audio_id`,charger:`binary_sensor.teddycloud_box_${t}_charger`,volumeDown:`event.teddycloud_box_${t}_volume_down`,volumeUp:`event.teddycloud_box_${t}_volume_up`,cacheContent:"switch.teddycloud_server_cloud_cachecontent_cache_cloud_content_on_local_server",enableCloud:"switch.teddycloud_server_cloud_enabled_generally_enable_cloud_operation"}}function _t(t,e){const i=ct(e);if(!i)throw new Error("Invalid entity selected - cannot extract Toniebox ID");return{entity_source:e,toniebox_id:i,toniebox_name:ht(t.states[e],i),selection_mode:"auto"}}customElements.define("teddy-card-editor",class extends st{static get properties(){return{hass:{},config:{},_availableDevices:{type:Array},_selectedEntity:{type:String}}}setConfig(t){this.config={toniebox_id:"",toniebox_name:"",language:"en",selection_mode:"manual",entity_source:"",...t},this.config.entity_source&&!t.selection_mode&&(this.config.selection_mode="auto"),this._selectedEntity=this.config.entity_source||"",this._updateAvailableDevices()}connectedCallback(){super.connectedCallback(),this._updateAvailableDevices()}updated(t){super.updated(t),t.has("hass")&&this._updateAvailableDevices()}_updateAvailableDevices(){if(this.hass){const t=function(t){const e=new Map;return t?.states?(Object.keys(t.states).forEach(t=>{if(dt(t)){const i=ct(t);i&&(e.has(i)||e.set(i,{id:i,entities:[],name:null,sampleEntity:t}),e.get(i).entities.push(t))}}),e.forEach((e,i)=>{const o=t.states[e.sampleEntity];e.name=ht(o,i)}),e):e}(this.hass);this._availableDevices=Array.from(t.values())}}get _toniebox_id(){return this.config.toniebox_id||""}get _toniebox_name(){return this.config.toniebox_name||""}get _language(){return this.config.language||"en"}get _selection_mode(){return this.config.selection_mode||"manual"}get _entity_source(){return this.config.entity_source||""}_isAutoMode(){return"auto"===this._selection_mode}_onModeToggle(t){const e=t.target.checked?"auto":"manual";if("auto"===e&&this._availableDevices.length>0){const t=this._availableDevices[0].sampleEntity;this._selectedEntity=t;try{const e=_t(this.hass,t);this._updateConfig({...e,selection_mode:"auto",language:this._language})}catch(t){console.warn("Could not auto-configure from entity:",t)}}else"manual"===e&&(this._updateConfig({...this.config,selection_mode:"manual",entity_source:""}),this._selectedEntity="")}_onEntitySelect(t){const e=t.target.value;if(this._selectedEntity=e,e&&this._isAutoMode())try{const t=_t(this.hass,e);this._updateConfig({...t,language:this._language})}catch(t){console.error("Could not create config from entity:",t)}}_valueChanged(t){if(!this.config||!this.hass)return;const e=t.target,i=e.configValue,o=e.value;if(this[`_${i}`]===o)return;const n={...this.config};i&&(""===o||void 0===o?delete n[i]:n[i]=o),this._updateConfig(n)}_updateConfig(t){const e=new Event("config-changed",{detail:{config:t},bubbles:!0,composed:!0});this.dispatchEvent(e)}_renderModeToggle(){const t=this._availableDevices&&this._availableDevices.length>0;return j`
+ */class se extends ${constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const e=super.createRenderRoot();return this.renderOptions.renderBefore??=e.firstChild,e}update(e){const t=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(e),this._$Do=((e,t,i)=>{const o=i?.renderBefore??t;let n=o._$litPart$;if(void 0===n){const e=i?.renderBefore??null;o._$litPart$=n=new Y(t.insertBefore(M(),e),e,void 0,i??{})}return n._$AI(e),n})(t,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return V}}se._$litElement$=!0,se.finalized=!0,ne.litElementHydrateSupport?.({LitElement:se});const re=ne.litElementPolyfillSupport;re?.({LitElement:se}),(ne.litElementVersions??=[]).push("4.2.1");const ae={en:{title:"Title",tag_uid:"Tag UID",charging_station:"Charging Station",volume_db:"Volume dB",volume_level:"Volume Level",small_ear_quieter:"Small Ear (quieter)",big_ear_louder:"Big Ear (louder)",content_audio_id:"Content Audio ID",cache_cloud_content:"Cache Cloud Content",enable_cloud_operation:"Enable Cloud Operation",config:{toniebox_id:"Toniebox ID",toniebox_name:"Toniebox Name",language:"Language",selection_mode:"Configuration Mode",entity_source:"Select Toniebox Entity",device_source:"Select Toniebox Device",toniebox_id_description:"The ID of your Toniebox (used in entity names)",toniebox_name_description:"Display name for your Toniebox",language_description:"Language for the card interface",selection_mode_description:"Choose how to configure your Toniebox",entity_source_description:"Select any entity from your Toniebox to auto-configure",device_source_description:"Select your Toniebox device directly from Home Assistant registry",mode_auto:"Auto-detect from entity",mode_manual:"Manual configuration",mode_device:"Device-based selection",no_devices_found:"No TeddyCloud devices found",no_ha_devices_found:"No TeddyCloud devices found in Home Assistant registry",devices_found:"Found {count} TeddyCloud device(s)",ha_devices_found:"Found {count} Toniebox device(s) in registry",entity_validation:"Entity Validation",device_validation:"Device Validation",entities_missing:"{count} of {total} entities missing",entities_all_found:"All entities found",device_valid:"Device configuration valid",device_invalid:"Device configuration invalid",switch_to_auto:"Switch to auto-detection",switch_to_manual:"Switch to manual setup",switch_to_device:"Switch to device selection"},errors:{missing_toniebox_id:"Toniebox ID is required",missing_toniebox_name:"Toniebox Name is required",entity_not_found:"Entity not found"}},de:{title:"Titel",tag_uid:"Tag UID",charging_station:"Ladestation",volume_db:"Lautstärke dB",volume_level:"Lautstärke Level",small_ear_quieter:"kleines Ohr (leiser)",big_ear_louder:"großes Ohr (lauter)",content_audio_id:"Content Audio ID",cache_cloud_content:"Cloud-Inhalte zwischenspeichern",enable_cloud_operation:"Cloud-Betrieb aktivieren",config:{toniebox_id:"Toniebox ID",toniebox_name:"Toniebox Name",language:"Sprache",selection_mode:"Konfigurationsmodus",entity_source:"Toniebox Entity auswählen",device_source:"Toniebox Gerät auswählen",toniebox_id_description:"Die ID Ihrer Toniebox (wird in Entity-Namen verwendet)",toniebox_name_description:"Anzeigename für Ihre Toniebox",language_description:"Sprache für die Karten-Oberfläche",selection_mode_description:"Wählen Sie, wie Sie Ihre Toniebox konfigurieren möchten",entity_source_description:"Wählen Sie eine Entity Ihrer Toniebox zur automatischen Konfiguration",device_source_description:"Wählen Sie Ihr Toniebox-Gerät direkt aus der Home Assistant Registrierung",mode_auto:"Automatische Erkennung von Entity",mode_manual:"Manuelle Konfiguration",mode_device:"Gerätebasierte Auswahl",no_devices_found:"Keine TeddyCloud Geräte gefunden",no_ha_devices_found:"Keine TeddyCloud Geräte in Home Assistant Registrierung gefunden",devices_found:"{count} TeddyCloud Gerät(e) gefunden",ha_devices_found:"{count} Toniebox-Gerät(e) in Registrierung gefunden",entity_validation:"Entity Validierung",device_validation:"Geräte Validierung",entities_missing:"{count} von {total} Entities fehlen",entities_all_found:"Alle Entities gefunden",device_valid:"Geräte-Konfiguration gültig",device_invalid:"Geräte-Konfiguration ungültig",switch_to_auto:"Zur automatischen Erkennung wechseln",switch_to_manual:"Zur manuellen Einrichtung wechseln",switch_to_device:"Zur Geräteauswahl wechseln"},errors:{missing_toniebox_id:"Toniebox ID ist erforderlich",missing_toniebox_name:"Toniebox Name ist erforderlich",entity_not_found:"Entity nicht gefunden"}}};function ce(e,t="en",i={}){const o=e.split(".");let n=ae[t]||ae.en;for(const e of o)n=n?.[e];if(!n)return e;let s=n;return Object.entries(i).forEach(([e,t])=>{s=s.replace(new RegExp(`\\{${e}\\}`,"g"),t)}),s}function de(e){if(!e||"string"!=typeof e)return null;const t=e.match(/teddycloud_box_([^_]+)_/);return t?t[1]:null}function le(e){return e&&e.includes("teddycloud_box_")}function he(e,t){if(!e?.attributes)return`Toniebox ${t}`;const i=e.attributes.friendly_name,o=e.attributes.name,n=e.attributes.device_name;return i?i.replace(/^TeddyCloud Box \w+ /,"").replace(/^Toniebox /,"").replace(/^Box /,"")||`Toniebox ${t}`:n||(o||`Toniebox ${t}`)}function ue(e){return{contentPicture:`image.teddycloud_box_${e}_content_picture`,contentTitle:`sensor.teddycloud_box_${e}_content_title`,tagValid:`sensor.teddycloud_box_${e}_tag_valid`,volumeDb:`sensor.teddycloud_box_${e}_volume_db`,volumeLevel:`sensor.teddycloud_box_${e}_volume_level`,contentAudioId:`sensor.teddycloud_box_${e}_content_audio_id`,charger:`binary_sensor.teddycloud_box_${e}_charger`,volumeDown:`event.teddycloud_box_${e}_volume_down`,volumeUp:`event.teddycloud_box_${e}_volume_up`,cacheContent:"switch.teddycloud_server_cloud_cachecontent_cache_cloud_content_on_local_server",enableCloud:"switch.teddycloud_server_cloud_enabled_generally_enable_cloud_operation"}}function _e(e,t){const i=de(t);if(!i)throw new Error("Invalid entity selected - cannot extract Toniebox ID");return{entity_source:t,toniebox_id:i,toniebox_name:he(e.states[t],i),selection_mode:"auto"}}function ge(e){const t=[];return e?.devices?(Object.values(e.devices).forEach(e=>{if(e.identifiers){const i=e.identifiers.find(e=>e.includes("toniebox_")||e.includes("teddycloud_server_"));if(i){const o=i.includes("toniebox_")?"box":"server",n=i.replace(/^(toniebox_|teddycloud_server_)/,"");t.push({id:n,device_id:e.id,name:e.name||e.name_by_user||`${o} ${n}`,type:o,manufacturer:e.manufacturer,model:e.model,sw_version:e.sw_version,hw_version:e.hw_version,identifiers:e.identifiers,connections:e.connections,via_device:e.via_device})}}}),t.sort((e,t)=>e.name.localeCompare(t.name))):t}function pe(e,t){const i=ge(e).find(e=>e.device_id===t);if(!i)throw new Error("Selected device not found");if("box"!==i.type)throw new Error("Only Toniebox devices can be selected for the card");return{device_source:t,toniebox_id:i.id,toniebox_name:i.name,selection_mode:"device"}}function ve(e,t){const i=ge(e).find(e=>e.device_id===t);if(!i)return{valid:!1,errors:["Device not found"],device:null,entities:[]};const o=function(e,t){const i=[];return e?.entities&&t?(Object.values(e.entities).forEach(e=>{e.device_id===t&&i.push(e.entity_id)}),i):i}(e,t),n=ue(i.id),s=[],r=[];return Object.entries(n).forEach(([e,t])=>{o.includes(t)?r.push({key:e,entityId:t}):s.push({key:e,entityId:t})}),{valid:0===s.length,device:i,entities:o,missing:s,available:r,totalExpected:Object.keys(n).length,foundCount:r.length}}customElements.define("teddy-card-editor",class extends se{static get properties(){return{hass:{},config:{},_availableDevices:{type:Array},_availableHADevices:{type:Array},_selectedEntity:{type:String},_selectedDevice:{type:String}}}setConfig(e){this.config={toniebox_id:"",toniebox_name:"",language:"en",selection_mode:"manual",entity_source:"",device_source:"",...e},this.config.entity_source&&!e.selection_mode&&(this.config.selection_mode="auto"),this.config.device_source&&!e.selection_mode&&(this.config.selection_mode="device"),this._selectedEntity=this.config.entity_source||"",this._selectedDevice=this.config.device_source||"",this._updateAvailableDevices()}connectedCallback(){super.connectedCallback(),this._updateAvailableDevices()}updated(e){super.updated(e),e.has("hass")&&this._updateAvailableDevices()}_updateAvailableDevices(){if(this.hass){const e=function(e){const t=new Map;return e?.states?(Object.keys(e.states).forEach(e=>{if(le(e)){const i=de(e);i&&(t.has(i)||t.set(i,{id:i,entities:[],name:null,sampleEntity:e}),t.get(i).entities.push(e))}}),t.forEach((t,i)=>{const o=e.states[t.sampleEntity];t.name=he(o,i)}),t):t}(this.hass);this._availableDevices=Array.from(e.values()),this._availableHADevices=ge(this.hass)}}get _toniebox_id(){return this.config.toniebox_id||""}get _toniebox_name(){return this.config.toniebox_name||""}get _language(){return this.config.language||"en"}get _selection_mode(){return this.config.selection_mode||"manual"}get _entity_source(){return this.config.entity_source||""}get _device_source(){return this.config.device_source||""}_isAutoMode(){return"auto"===this._selection_mode}_isDeviceMode(){return"device"===this._selection_mode}_isManualMode(){return"manual"===this._selection_mode}_onModeChange(e){const t=e.target.value;if("auto"===t&&this._availableDevices.length>0){const e=this._availableDevices[0].sampleEntity;this._selectedEntity=e;try{const t=_e(this.hass,e);this._updateConfig({...t,selection_mode:"auto",language:this._language})}catch(e){console.warn("Could not auto-configure from entity:",e)}}else if("device"===t&&this._availableHADevices.length>0){const e=this._availableHADevices[0];this._selectedDevice=e.device_id;try{const t=pe(this.hass,e.device_id);this._updateConfig({...t,language:this._language})}catch(e){console.warn("Could not auto-configure from device:",e)}}else"manual"===t&&(this._updateConfig({...this.config,selection_mode:"manual",entity_source:"",device_source:""}),this._selectedEntity="",this._selectedDevice="")}_onEntitySelect(e){const t=e.target.value;if(this._selectedEntity=t,t&&this._isAutoMode())try{const e=_e(this.hass,t);this._updateConfig({...e,language:this._language})}catch(e){console.error("Could not create config from entity:",e)}}_onDeviceSelect(e){const t=e.target.value;if(this._selectedDevice=t,t&&this._isDeviceMode())try{const e=pe(this.hass,t);this._updateConfig({...e,language:this._language})}catch(e){console.error("Could not create config from device:",e)}}_valueChanged(e){if(!this.config||!this.hass)return;const t=e.target,i=t.configValue,o=t.value;if(this[`_${i}`]===o)return;const n={...this.config};i&&(""===o||void 0===o?delete n[i]:n[i]=o),this._updateConfig(n)}_updateConfig(e){const t=new Event("config-changed",{detail:{config:e},bubbles:!0,composed:!0});this.dispatchEvent(t)}_renderModeToggle(){const e=this._availableDevices&&this._availableDevices.length>0,t=this._availableHADevices&&this._availableHADevices.length>0;return L`
       <div class="mode-toggle">
-        <div class="toggle-container">
-          <ha-switch
-            .checked=${this._isAutoMode()}
-            .disabled=${!t}
-            @change=${this._onModeToggle}
-          ></ha-switch>
-          <div class="toggle-label">
-            <strong>${lt("config.selection_mode",this._language)}</strong>
-            <div class="toggle-description">
-              ${this._isAutoMode()?lt("config.mode_auto",this._language):lt("config.mode_manual",this._language)}
-            </div>
-          </div>
+        <div class="form-group">
+          <ha-select
+            label="${ce("config.selection_mode",this._language)}"
+            .value=${this._selection_mode}
+            @selected=${this._onModeChange}
+            helper-text="${ce("config.selection_mode_description",this._language)}"
+          >
+            <mwc-list-item value="manual">${ce("config.mode_manual",this._language)}</mwc-list-item>
+            <mwc-list-item value="auto" .disabled=${!e}>
+              ${ce("config.mode_auto",this._language)}
+            </mwc-list-item>
+            <mwc-list-item value="device" .disabled=${!t}>
+              ${ce("config.mode_device",this._language)}
+            </mwc-list-item>
+          </ha-select>
         </div>
         
-        ${t?j`
-          <div class="devices-info">
-            ${lt("config.devices_found",this._language,{count:this._availableDevices.length})}
-          </div>
-        `:j`
-          <ha-alert alert-type="warning">
-            ${lt("config.no_devices_found",this._language)}
-          </ha-alert>
-        `}
+        <div class="device-status">
+          ${e||t?L`
+            <div class="devices-info">
+              ${e?L`
+                <div>📊 ${ce("config.devices_found",this._language,{count:this._availableDevices.length})}</div>
+              `:""}
+              ${t?L`
+                <div>🔧 ${ce("config.ha_devices_found",this._language,{count:this._availableHADevices.length})}</div>
+              `:""}
+            </div>
+          `:L`
+            <ha-alert alert-type="warning">
+              ${ce("config.no_devices_found",this._language)} & ${ce("config.no_ha_devices_found",this._language)}
+            </ha-alert>
+          `}
+        </div>
       </div>
-    `}_renderAutoModeConfig(){const t=(e=this.hass,e?.states?Object.keys(e.states).filter(t=>dt(t)).map(t=>{const i=e.states[t],o=ct(t);return{value:t,label:`${ht(i,o)} (${i.attributes?.friendly_name||t})`,boxId:o}}).sort((t,e)=>t.label.localeCompare(e.label)):[]);var e;return j`
+    `}_renderAutoModeConfig(){const e=(t=this.hass,t?.states?Object.keys(t.states).filter(e=>le(e)).map(e=>{const i=t.states[e],o=de(e);return{value:e,label:`${he(i,o)} (${i.attributes?.friendly_name||e})`,boxId:o}}).sort((e,t)=>e.label.localeCompare(t.label)):[]);var t;return L`
       <div class="auto-config">
         <div class="form-group">
           <ha-select
-            label="${lt("config.entity_source",this._language)}"
+            label="${ce("config.entity_source",this._language)}"
             .value=${this._selectedEntity}
             @selected=${this._onEntitySelect}
-            helper-text="${lt("config.entity_source_description",this._language)}"
+            helper-text="${ce("config.entity_source_description",this._language)}"
           >
             <mwc-list-item value="">-- Select Entity --</mwc-list-item>
-            ${t.map(t=>j`
-              <mwc-list-item value="${t.value}">
-                ${t.label}
+            ${e.map(e=>L`
+              <mwc-list-item value="${e.value}">
+                ${e.label}
               </mwc-list-item>
             `)}
           </ha-select>
         </div>
 
-        ${this._selectedEntity?j`
+        ${this._selectedEntity?L`
           <div class="auto-detected-info">
-            <h4>${lt("config.entity_validation",this._language)}</h4>
+            <h4>${ce("config.entity_validation",this._language)}</h4>
             ${this._renderEntityValidation()}
           </div>
         `:""}
       </div>
-    `}_renderManualModeConfig(){return j`
+    `}_renderDeviceModeConfig(){const e=ge(this.hass).filter(e=>"box"===e.type).map(e=>({value:e.device_id,label:`${e.name} (${e.id})`,device:e}));return L`
+      <div class="device-config">
+        <div class="form-group">
+          <ha-select
+            label="${ce("config.device_source",this._language)}"
+            .value=${this._selectedDevice}
+            @selected=${this._onDeviceSelect}
+            helper-text="${ce("config.device_source_description",this._language)}"
+          >
+            <mwc-list-item value="">-- Select Device --</mwc-list-item>
+            ${e.map(e=>L`
+              <mwc-list-item value="${e.value}">
+                ${e.label}
+              </mwc-list-item>
+            `)}
+          </ha-select>
+        </div>
+
+        ${this._selectedDevice?L`
+          <div class="device-info">
+            <h4>${ce("config.device_validation",this._language)}</h4>
+            ${this._renderDeviceValidation()}
+          </div>
+        `:""}
+      </div>
+    `}_renderManualModeConfig(){return L`
       <div class="manual-config">
         <div class="form-group">
           <ha-textfield
-            label="${lt("config.toniebox_id",this._language)}"
+            label="${ce("config.toniebox_id",this._language)}"
             .value=${this._toniebox_id}
             .configValue=${"toniebox_id"}
             @input=${this._valueChanged}
             required
-            helper-text="${lt("config.toniebox_id_description",this._language)}"
+            helper-text="${ce("config.toniebox_id_description",this._language)}"
           ></ha-textfield>
         </div>
 
         <div class="form-group">
           <ha-textfield
-            label="${lt("config.toniebox_name",this._language)}"
+            label="${ce("config.toniebox_name",this._language)}"
             .value=${this._toniebox_name}
             .configValue=${"toniebox_name"}
             @input=${this._valueChanged}
             required
-            helper-text="${lt("config.toniebox_name_description",this._language)}"
+            helper-text="${ce("config.toniebox_name_description",this._language)}"
           ></ha-textfield>
         </div>
 
-        ${this._toniebox_id?j`
+        ${this._toniebox_id?L`
           <div class="validation-info">
-            <h4>${lt("config.entity_validation",this._language)}</h4>
+            <h4>${ce("config.entity_validation",this._language)}</h4>
             ${this._renderEntityValidation()}
           </div>
         `:""}
       </div>
-    `}_renderEntityValidation(){if(!this._toniebox_id)return j`<div class="no-validation">Enter Toniebox ID to validate entities</div>`;const t=function(t,e){const i=ut(e),o=[],n=[];return Object.entries(i).forEach(([e,i])=>{t?.states?.[i]?n.push({key:e,entityId:i}):o.push({key:e,entityId:i})}),{valid:0===o.length,missing:o,available:n,totalExpected:Object.keys(i).length,foundCount:n.length}}(this.hass,this._toniebox_id);return j`
+    `}_renderEntityValidation(){if(!this._toniebox_id)return L`<div class="no-validation">Enter Toniebox ID to validate entities</div>`;const e=function(e,t){const i=ue(t),o=[],n=[];return Object.entries(i).forEach(([t,i])=>{e?.states?.[i]?n.push({key:t,entityId:i}):o.push({key:t,entityId:i})}),{valid:0===o.length,missing:o,available:n,totalExpected:Object.keys(i).length,foundCount:n.length}}(this.hass,this._toniebox_id);return L`
       <div class="entity-validation">
-        ${t.valid?j`
+        ${e.valid?L`
           <ha-alert alert-type="success">
-            ${lt("config.entities_all_found",this._language)}
+            ${ce("config.entities_all_found",this._language)}
           </ha-alert>
-        `:j`
+        `:L`
           <ha-alert alert-type="warning">
-            ${lt("config.entities_missing",this._language,{count:t.missing.length,total:t.totalExpected})}
+            ${ce("config.entities_missing",this._language,{count:e.missing.length,total:e.totalExpected})}
           </ha-alert>
         `}
         
         <div class="entity-status">
           <div class="found-entities">
-            <h5>✅ Available (${t.foundCount})</h5>
+            <h5>✅ Available (${e.foundCount})</h5>
             <ul>
-              ${t.available.map(t=>j`
-                <li><code>${t.entityId}</code></li>
+              ${e.available.map(e=>L`
+                <li><code>${e.entityId}</code></li>
               `)}
             </ul>
           </div>
           
-          ${t.missing.length>0?j`
+          ${e.missing.length>0?L`
             <div class="missing-entities">
-              <h5>❌ Missing (${t.missing.length})</h5>
+              <h5>❌ Missing (${e.missing.length})</h5>
               <ul>
-                ${t.missing.map(t=>j`
-                  <li><code>${t.entityId}</code></li>
+                ${e.missing.map(e=>L`
+                  <li><code>${e.entityId}</code></li>
                 `)}
               </ul>
             </div>
           `:""}
         </div>
       </div>
-    `}render(){return this.hass?j`
+    `}_renderDeviceValidation(){if(!this._selectedDevice)return L`<div class="no-validation">Select device to validate configuration</div>`;const e=ve(this.hass,this._selectedDevice);return L`
+      <div class="device-validation">
+        ${e.valid?L`
+          <ha-alert alert-type="success">
+            ${ce("config.device_valid",this._language)}
+          </ha-alert>
+        `:L`
+          <ha-alert alert-type="warning">
+            ${ce("config.device_invalid",this._language)} - ${ce("config.entities_missing",this._language,{count:e.missing.length,total:e.totalExpected})}
+          </ha-alert>
+        `}
+        
+        <div class="device-info-details">
+          <h5>🔧 Device: ${e.device?.name}</h5>
+          <div class="device-properties">
+            <div><strong>ID:</strong> ${e.device?.id}</div>
+            <div><strong>Model:</strong> ${e.device?.model}</div>
+            <div><strong>Manufacturer:</strong> ${e.device?.manufacturer}</div>
+          </div>
+        </div>
+        
+        <div class="entity-status">
+          <div class="found-entities">
+            <h5>✅ Available (${e.foundCount})</h5>
+            <ul>
+              ${e.available.map(e=>L`
+                <li><code>${e.entityId}</code></li>
+              `)}
+            </ul>
+          </div>
+          
+          ${e.missing.length>0?L`
+            <div class="missing-entities">
+              <h5>❌ Missing (${e.missing.length})</h5>
+              <ul>
+                ${e.missing.map(e=>L`
+                  <li><code>${e.entityId}</code></li>
+                `)}
+              </ul>
+            </div>
+          `:""}
+        </div>
+      </div>
+    `}render(){return this.hass?L`
       <div class="card-config">
         ${this._renderModeToggle()}
         
-        ${this._isAutoMode()?this._renderAutoModeConfig():this._renderManualModeConfig()}
+        ${this._isAutoMode()?this._renderAutoModeConfig():this._isDeviceMode()?this._renderDeviceModeConfig():this._renderManualModeConfig()}
 
         <div class="form-group">
           <ha-select
-            label="${lt("config.language",this._language)}"
+            label="${ce("config.language",this._language)}"
             .value=${this._language}
             .configValue=${"language"}
             @selected=${this._valueChanged}
-            helper-text="${lt("config.language_description",this._language)}"
+            helper-text="${ce("config.language_description",this._language)}"
           >
             <mwc-list-item value="en">English</mwc-list-item>
             <mwc-list-item value="de">Deutsch</mwc-list-item>
@@ -155,26 +233,26 @@ const x=globalThis,A=x.trustedTypes,E=A?A.createPolicy("lit-html",{createHTML:t=
         </div>
 
         <div class="validation-summary">
-          ${this._toniebox_id||this._isAutoMode()?"":j`
+          ${!this._toniebox_id&&this._isManualMode()?L`
             <ha-alert alert-type="error">
-              ${lt("errors.missing_toniebox_id",this._language)}
+              ${ce("errors.missing_toniebox_id",this._language)}
             </ha-alert>
-          `}
+          `:""}
           
-          ${this._toniebox_name||this._isAutoMode()?"":j`
+          ${!this._toniebox_name&&this._isManualMode()?L`
             <ha-alert alert-type="error">
-              ${lt("errors.missing_toniebox_name",this._language)}
+              ${ce("errors.missing_toniebox_name",this._language)}
             </ha-alert>
-          `}
+          `:""}
 
-          ${this._toniebox_id&&this._toniebox_name||this._isAutoMode()?j`
+          ${this._toniebox_id&&this._toniebox_name||!this._isManualMode()?L`
             <ha-alert alert-type="success">
               Configuration is valid! 🎉
             </ha-alert>
           `:""}
         </div>
       </div>
-    `:j``}static get styles(){return s`
+    `:L``}static get styles(){return s`
       .card-config {
         padding: 20px;
       }
@@ -220,7 +298,8 @@ const x=globalThis,A=x.trustedTypes,E=A?A.createPolicy("lit-html",{createHTML:t=
       }
 
       .auto-config,
-      .manual-config {
+      .manual-config,
+      .device-config {
         background: var(--card-background-color);
         border-radius: 8px;
         padding: 16px;
@@ -229,20 +308,40 @@ const x=globalThis,A=x.trustedTypes,E=A?A.createPolicy("lit-html",{createHTML:t=
       }
 
       .auto-detected-info,
-      .validation-info {
+      .validation-info,
+      .device-info {
         margin-top: 16px;
       }
 
       .auto-detected-info h4,
-      .validation-info h4 {
+      .validation-info h4,
+      .device-info h4 {
         margin: 0 0 12px 0;
         color: var(--primary-text-color);
       }
 
-      .entity-validation {
+      .entity-validation,
+      .device-validation {
         background: var(--code-editor-background-color, #f8f9fa);
         border-radius: 8px;
         padding: 12px;
+      }
+
+      .device-info-details {
+        margin-bottom: 16px;
+        padding: 8px;
+        background: var(--card-background-color);
+        border-radius: 4px;
+        border-left: 4px solid var(--primary-color);
+      }
+
+      .device-properties {
+        margin-top: 8px;
+        font-size: 14px;
+      }
+
+      .device-properties div {
+        margin-bottom: 4px;
       }
 
       .entity-status {
@@ -302,23 +401,23 @@ const x=globalThis,A=x.trustedTypes,E=A?A.createPolicy("lit-html",{createHTML:t=
           grid-template-columns: 1fr;
         }
       }
-    `}});const gt="1.1.0";console.info(`%c TEDDY-CARD %c v${gt} `,"color: white; font-weight: bold; background: #03a9f4","color: white; font-weight: bold; background: #606060");class pt extends st{static get properties(){return{hass:{},config:{}}}updated(t){super.updated(t),t.has("hass")&&this._updateAutoDetectedName()}static getConfigElement(){return document.createElement("teddy-card-editor")}static getStubConfig(){return{toniebox_id:"12345678",toniebox_name:"My Toniebox",language:"en",selection_mode:"manual"}}setConfig(t){const e={...t};if(e.entity_source&&!e.selection_mode&&(e.selection_mode="auto"),e.selection_mode||(e.selection_mode="manual"),"auto"===e.selection_mode&&e.entity_source){const t=ct(e.entity_source);t&&(e.toniebox_id=t)}if("manual"===e.selection_mode){if(!e.toniebox_id)throw new Error(lt("errors.missing_toniebox_id",e.language));if(!e.toniebox_name)throw new Error(lt("errors.missing_toniebox_name",e.language))}else if("auto"===e.selection_mode){if(!e.entity_source)throw new Error("Entity source is required for auto mode");if(!e.toniebox_id)throw new Error("Could not extract Toniebox ID from selected entity")}this.config={language:"en",selection_mode:"manual",...e},this._updateAutoDetectedName()}_updateAutoDetectedName(){if(this.hass&&"auto"===this.config?.selection_mode&&this.config?.entity_source){const t=this.hass.states[this.config.entity_source];if(t&&!this.config.toniebox_name){const e=ht(t,this.config.toniebox_id);e!==this.config.toniebox_name&&(this.config={...this.config,toniebox_name:e},this.requestUpdate())}}}getCardSize(){return 7}_getExpectedEntities(){return this.config?.toniebox_id?ut(this.config.toniebox_id):{}}_renderEntityRow(t,e,i=null){const o=this.hass.states[t];return o?j`
-      <div class="entity-row" @click=${()=>this._showMoreInfo(t)}>
-        ${i?j`<ha-icon icon="${i}" class="state-icon"></ha-icon>`:""}
+    `}});const fe="1.2.0";console.info(`%c TEDDY-CARD %c v${fe} `,"color: white; font-weight: bold; background: #03a9f4","color: white; font-weight: bold; background: #606060");class me extends se{static get properties(){return{hass:{},config:{}}}updated(e){super.updated(e),e.has("hass")&&(this._updateAutoDetectedName(),this._updateDeviceConfiguration())}static getConfigElement(){return document.createElement("teddy-card-editor")}static getStubConfig(){return{toniebox_id:"12345678",toniebox_name:"My Toniebox",language:"en",selection_mode:"manual"}}setConfig(e){const t={...e};if(t.entity_source&&!t.selection_mode&&(t.selection_mode="auto"),t.device_source&&!t.selection_mode&&(t.selection_mode="device"),t.selection_mode||(t.selection_mode="manual"),"auto"===t.selection_mode&&t.entity_source){const e=de(t.entity_source);e&&(t.toniebox_id=e)}if("device"===t.selection_mode&&t.device_source&&this._updateDeviceConfiguration(t),"manual"===t.selection_mode){if(!t.toniebox_id)throw new Error(ce("errors.missing_toniebox_id",t.language));if(!t.toniebox_name)throw new Error(ce("errors.missing_toniebox_name",t.language))}else if("auto"===t.selection_mode){if(!t.entity_source)throw new Error("Entity source is required for auto mode");if(!t.toniebox_id)throw new Error("Could not extract Toniebox ID from selected entity")}else if("device"===t.selection_mode&&!t.device_source)throw new Error("Device source is required for device mode");this.config={language:"en",selection_mode:"manual",...t},this._updateAutoDetectedName()}_updateAutoDetectedName(){if(this.hass&&"auto"===this.config?.selection_mode&&this.config?.entity_source){const e=this.hass.states[this.config.entity_source];if(e&&!this.config.toniebox_name){const t=he(e,this.config.toniebox_id);t!==this.config.toniebox_name&&(this.config={...this.config,toniebox_name:t},this.requestUpdate())}}}_updateDeviceConfiguration(e=null){const t=e||this.config;if(this.hass&&"device"===t?.selection_mode&&t?.device_source)try{const i=pe(this.hass,t.device_source);if(!t.toniebox_id||!t.toniebox_name){const o={...t,...i};e?Object.assign(e,i):(this.config=o,this.requestUpdate())}}catch(e){console.warn("Could not update device configuration:",e)}}getCardSize(){return 7}_getExpectedEntities(){return this.config?.toniebox_id?ue(this.config.toniebox_id):{}}_renderEntityRow(e,t,i=null){const o=this.hass.states[e];return o?L`
+      <div class="entity-row" @click=${()=>this._showMoreInfo(e)}>
+        ${i?L`<ha-icon icon="${i}" class="state-icon"></ha-icon>`:""}
         <div class="entity-info">
-          <span class="entity-name">${e}</span>
+          <span class="entity-name">${t}</span>
           <span class="entity-state">${o.state} ${o.attributes.unit_of_measurement||""}</span>
         </div>
       </div>
-    `:j`
+    `:L`
         <div class="entity-row unavailable">
           <ha-icon icon="mdi:alert-circle" class="state-icon"></ha-icon>
           <div class="entity-info">
-            <span class="entity-name">${e}</span>
-            <span class="entity-state unavailable">${lt("errors.entity_not_found",this.config.language)}</span>
+            <span class="entity-name">${t}</span>
+            <span class="entity-state unavailable">${ce("errors.entity_not_found",this.config.language)}</span>
           </div>
         </div>
-      `}_showMoreInfo(t){const e=new Event("hass-more-info",{bubbles:!0,composed:!0});e.detail={entityId:t},this.dispatchEvent(e)}render(){if(!this.config||!this.hass)return j``;const t=this.config.language||"en",e=this._getExpectedEntities();if(!e||0===Object.keys(e).length)return j`
+      `}_showMoreInfo(e){const t=new Event("hass-more-info",{bubbles:!0,composed:!0});t.detail={entityId:e},this.dispatchEvent(t)}render(){if(!this.config||!this.hass)return L``;const e=this.config.language||"en",t=this._getExpectedEntities();if(!t||0===Object.keys(t).length)return L`
         <ha-card>
           <div class="card-content error">
             <ha-icon icon="mdi:alert-circle" class="error-icon"></ha-icon>
@@ -328,38 +427,38 @@ const x=globalThis,A=x.trustedTypes,E=A?A.createPolicy("lit-html",{createHTML:t=
             </div>
           </div>
         </ha-card>
-      `;const i=this.hass.states[e.contentPicture];return this.hass.states[e.contentTitle],j`
+      `;const i=this.hass.states[t.contentPicture];return this.hass.states[t.contentTitle],L`
       <ha-card header="${this.config.toniebox_name}">
         <div class="card-content">
           <!-- Picture Section -->
           <div class="picture-section">
-            ${i&&i.attributes.entity_picture?j`<img src="${i.attributes.entity_picture}" alt="${lt("title",t)}" />`:j`<div class="picture-placeholder">
+            ${i&&i.attributes.entity_picture?L`<img src="${i.attributes.entity_picture}" alt="${ce("title",e)}" />`:L`<div class="picture-placeholder">
                   <ha-icon icon="mdi:teddy-bear"></ha-icon>
                 </div>`}
           </div>
 
           <!-- Content Title -->
           <div class="title-section">
-            ${this._renderEntityRow(e.contentTitle,lt("title",t),"mdi:music")}
+            ${this._renderEntityRow(t.contentTitle,ce("title",e),"mdi:music")}
           </div>
 
           <!-- Main Entities -->
           <div class="entities-section">
             <h3>${this.config.toniebox_name}</h3>
-            ${this._renderEntityRow(e.tagValid,lt("tag_uid",t),"mdi:tag")}
-            ${this._renderEntityRow(e.charger,lt("charging_station",t),"mdi:battery-charging")}
-            ${this._renderEntityRow(e.volumeDb,lt("volume_db",t),"mdi:volume-high")}
-            ${this._renderEntityRow(e.volumeLevel,lt("volume_level",t),"mdi:volume-medium")}
-            ${this._renderEntityRow(e.volumeDown,lt("small_ear_quieter",t),"mdi:ear-hearing-off")}
-            ${this._renderEntityRow(e.volumeUp,lt("big_ear_louder",t),"mdi:ear-hearing")}
-            ${this._renderEntityRow(e.contentAudioId,lt("content_audio_id",t),"mdi:identifier")}
+            ${this._renderEntityRow(t.tagValid,ce("tag_uid",e),"mdi:tag")}
+            ${this._renderEntityRow(t.charger,ce("charging_station",e),"mdi:battery-charging")}
+            ${this._renderEntityRow(t.volumeDb,ce("volume_db",e),"mdi:volume-high")}
+            ${this._renderEntityRow(t.volumeLevel,ce("volume_level",e),"mdi:volume-medium")}
+            ${this._renderEntityRow(t.volumeDown,ce("small_ear_quieter",e),"mdi:ear-hearing-off")}
+            ${this._renderEntityRow(t.volumeUp,ce("big_ear_louder",e),"mdi:ear-hearing")}
+            ${this._renderEntityRow(t.contentAudioId,ce("content_audio_id",e),"mdi:identifier")}
           </div>
 
           <!-- Server Settings -->
           <div class="entities-section">
             <h3>TeddyCloud Server</h3>
-            ${this._renderEntityRow(e.cacheContent,lt("cache_cloud_content",t),"mdi:cloud-download")}
-            ${this._renderEntityRow(e.enableCloud,lt("enable_cloud_operation",t),"mdi:cloud")}
+            ${this._renderEntityRow(t.cacheContent,ce("cache_cloud_content",e),"mdi:cloud-download")}
+            ${this._renderEntityRow(t.enableCloud,ce("enable_cloud_operation",e),"mdi:cloud")}
           </div>
         </div>
       </ha-card>
@@ -514,4 +613,4 @@ const x=globalThis,A=x.trustedTypes,E=A?A.createPolicy("lit-html",{createHTML:t=
           text-align: left;
         }
       }
-    `}}customElements.define("teddy-card",pt),window.customCards=window.customCards||[],window.customCards.push({type:"teddy-card",name:"TeddyCloud Toniebox Card",description:"A custom card for displaying TeddyCloud Toniebox information",version:gt}),console.info("%c TEDDY-CARD %c Card registered successfully","color: white; font-weight: bold; background: #03a9f4","color: white; font-weight: bold; background: #4caf50");export{pt as TeddyCard};
+    `}}customElements.define("teddy-card",me),window.customCards=window.customCards||[],window.customCards.push({type:"teddy-card",name:"TeddyCloud Toniebox Card",description:"A custom card for displaying TeddyCloud Toniebox information",version:fe}),console.info("%c TEDDY-CARD %c Card registered successfully","color: white; font-weight: bold; background: #03a9f4","color: white; font-weight: bold; background: #4caf50");export{me as TeddyCard};

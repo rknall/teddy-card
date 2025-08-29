@@ -212,3 +212,152 @@ export function createConfigFromEntity(hass, entityId) {
     selection_mode: 'auto'
   };
 }
+
+/**
+ * Discover TeddyCloud devices from Home Assistant device registry
+ * @param {object} hass - Home Assistant object
+ * @returns {Array} Array of TeddyCloud devices
+ */
+export function findTeddyCloudHADevices(hass) {
+  const devices = [];
+  
+  if (!hass?.devices) {
+    return devices;
+  }
+  
+  // Look for devices with TeddyCloud identifiers
+  Object.values(hass.devices).forEach(device => {
+    if (device.identifiers) {
+      const teddyIdentifier = device.identifiers.find(id => 
+        id.includes('toniebox_') || id.includes('teddycloud_server_')
+      );
+      
+      if (teddyIdentifier) {
+        const deviceType = teddyIdentifier.includes('toniebox_') ? 'box' : 'server';
+        const deviceId = teddyIdentifier.replace(/^(toniebox_|teddycloud_server_)/, '');
+        
+        devices.push({
+          id: deviceId,
+          device_id: device.id,
+          name: device.name || device.name_by_user || `${deviceType} ${deviceId}`,
+          type: deviceType,
+          manufacturer: device.manufacturer,
+          model: device.model,
+          sw_version: device.sw_version,
+          hw_version: device.hw_version,
+          identifiers: device.identifiers,
+          connections: device.connections,
+          via_device: device.via_device
+        });
+      }
+    }
+  });
+  
+  return devices.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Get all entities associated with a specific device
+ * @param {object} hass - Home Assistant object
+ * @param {string} deviceId - The Home Assistant device ID
+ * @returns {Array} Array of entity IDs associated with the device
+ */
+export function getDeviceEntities(hass, deviceId) {
+  const entities = [];
+  
+  if (!hass?.entities || !deviceId) {
+    return entities;
+  }
+  
+  Object.values(hass.entities).forEach(entityReg => {
+    if (entityReg.device_id === deviceId) {
+      entities.push(entityReg.entity_id);
+    }
+  });
+  
+  return entities;
+}
+
+/**
+ * Create configuration from selected device
+ * @param {object} hass - Home Assistant object  
+ * @param {string} deviceId - The selected device ID
+ * @returns {object} Configuration object
+ */
+export function createConfigFromDevice(hass, deviceId) {
+  const devices = findTeddyCloudHADevices(hass);
+  const device = devices.find(d => d.device_id === deviceId);
+  
+  if (!device) {
+    throw new Error('Selected device not found');
+  }
+  
+  if (device.type !== 'box') {
+    throw new Error('Only Toniebox devices can be selected for the card');
+  }
+  
+  return {
+    device_source: deviceId,
+    toniebox_id: device.id,
+    toniebox_name: device.name,
+    selection_mode: 'device'
+  };
+}
+
+/**
+ * Validate device-based configuration
+ * @param {object} hass - Home Assistant object
+ * @param {string} deviceId - Device ID to validate
+ * @returns {object} Validation result
+ */
+export function validateDeviceConfiguration(hass, deviceId) {
+  const devices = findTeddyCloudHADevices(hass);
+  const device = devices.find(d => d.device_id === deviceId);
+  
+  if (!device) {
+    return {
+      valid: false,
+      errors: ['Device not found'],
+      device: null,
+      entities: []
+    };
+  }
+  
+  const entities = getDeviceEntities(hass, deviceId);
+  const expectedEntities = getExpectedEntities(device.id);
+  const missing = [];
+  const available = [];
+  
+  Object.entries(expectedEntities).forEach(([key, entityId]) => {
+    if (entities.includes(entityId)) {
+      available.push({ key, entityId });
+    } else {
+      missing.push({ key, entityId });
+    }
+  });
+  
+  return {
+    valid: missing.length === 0,
+    device,
+    entities: entities,
+    missing,
+    available,
+    totalExpected: Object.keys(expectedEntities).length,
+    foundCount: available.length
+  };
+}
+
+/**
+ * Get suggested devices for device picker
+ * @param {object} hass - Home Assistant object
+ * @returns {Array} Array of device objects suitable for device picker
+ */
+export function getSuggestedDevices(hass) {
+  return findTeddyCloudHADevices(hass)
+    .filter(device => device.type === 'box')
+    .map(device => ({
+      value: device.device_id,
+      label: `${device.name} (${device.id})`,
+      device: device
+    }));
+}

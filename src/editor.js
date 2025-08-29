@@ -5,7 +5,11 @@ import {
   getSuggestedEntities, 
   createConfigFromEntity,
   validateTonieboxEntities,
-  extractBoxIdFromEntity
+  extractBoxIdFromEntity,
+  getSuggestedDevices,
+  createConfigFromDevice,
+  validateDeviceConfiguration,
+  findTeddyCloudHADevices
 } from './utils.js';
 
 export class TeddyCardEditor extends LitElement {
@@ -14,7 +18,9 @@ export class TeddyCardEditor extends LitElement {
       hass: {},
       config: {},
       _availableDevices: { type: Array },
-      _selectedEntity: { type: String }
+      _availableHADevices: { type: Array },
+      _selectedEntity: { type: String },
+      _selectedDevice: { type: String }
     };
   }
 
@@ -26,6 +32,7 @@ export class TeddyCardEditor extends LitElement {
       language: 'en',
       selection_mode: 'manual', // Default to manual for backward compatibility
       entity_source: '',
+      device_source: '',
       ...config 
     };
     
@@ -34,7 +41,13 @@ export class TeddyCardEditor extends LitElement {
       this.config.selection_mode = 'auto';
     }
     
+    // Auto-detect if we have device_source but no selection_mode  
+    if (this.config.device_source && !config.selection_mode) {
+      this.config.selection_mode = 'device';
+    }
+    
     this._selectedEntity = this.config.entity_source || '';
+    this._selectedDevice = this.config.device_source || '';
     this._updateAvailableDevices();
   }
 
@@ -53,8 +66,12 @@ export class TeddyCardEditor extends LitElement {
 
   _updateAvailableDevices() {
     if (this.hass) {
+      // Entity-based devices (from entity discovery)
       const devices = findTeddyCloudDevices(this.hass);
       this._availableDevices = Array.from(devices.values());
+      
+      // HA device registry devices (for device mode)
+      this._availableHADevices = findTeddyCloudHADevices(this.hass);
     }
   }
 
@@ -78,12 +95,24 @@ export class TeddyCardEditor extends LitElement {
     return this.config.entity_source || '';
   }
 
+  get _device_source() {
+    return this.config.device_source || '';
+  }
+
   _isAutoMode() {
     return this._selection_mode === 'auto';
   }
 
-  _onModeToggle(ev) {
-    const newMode = ev.target.checked ? 'auto' : 'manual';
+  _isDeviceMode() {
+    return this._selection_mode === 'device';
+  }
+
+  _isManualMode() {
+    return this._selection_mode === 'manual';
+  }
+
+  _onModeChange(ev) {
+    const newMode = ev.target.value;
     
     if (newMode === 'auto' && this._availableDevices.length > 0) {
       // Auto-select first available device if switching to auto mode
@@ -101,13 +130,29 @@ export class TeddyCardEditor extends LitElement {
       } catch (error) {
         console.warn('Could not auto-configure from entity:', error);
       }
+    } else if (newMode === 'device' && this._availableHADevices.length > 0) {
+      // Auto-select first available HA device if switching to device mode
+      const firstDevice = this._availableHADevices[0];
+      this._selectedDevice = firstDevice.device_id;
+      
+      try {
+        const deviceConfig = createConfigFromDevice(this.hass, firstDevice.device_id);
+        this._updateConfig({
+          ...deviceConfig,
+          language: this._language
+        });
+      } catch (error) {
+        console.warn('Could not auto-configure from device:', error);
+      }
     } else if (newMode === 'manual') {
       this._updateConfig({
         ...this.config,
         selection_mode: 'manual',
-        entity_source: ''
+        entity_source: '',
+        device_source: ''
       });
       this._selectedEntity = '';
+      this._selectedDevice = '';
     }
   }
 
@@ -124,6 +169,23 @@ export class TeddyCardEditor extends LitElement {
         });
       } catch (error) {
         console.error('Could not create config from entity:', error);
+      }
+    }
+  }
+
+  _onDeviceSelect(ev) {
+    const deviceId = ev.target.value;
+    this._selectedDevice = deviceId;
+    
+    if (deviceId && this._isDeviceMode()) {
+      try {
+        const deviceConfig = createConfigFromDevice(this.hass, deviceId);
+        this._updateConfig({
+          ...deviceConfig,
+          language: this._language
+        });
+      } catch (error) {
+        console.error('Could not create config from device:', error);
       }
     }
   }
@@ -163,38 +225,48 @@ export class TeddyCardEditor extends LitElement {
   }
 
   _renderModeToggle() {
-    const hasDevices = this._availableDevices && this._availableDevices.length > 0;
+    const hasEntityDevices = this._availableDevices && this._availableDevices.length > 0;
+    const hasHADevices = this._availableHADevices && this._availableHADevices.length > 0;
     
     return html`
       <div class="mode-toggle">
-        <div class="toggle-container">
-          <ha-switch
-            .checked=${this._isAutoMode()}
-            .disabled=${!hasDevices}
-            @change=${this._onModeToggle}
-          ></ha-switch>
-          <div class="toggle-label">
-            <strong>${localize('config.selection_mode', this._language)}</strong>
-            <div class="toggle-description">
-              ${this._isAutoMode() 
-                ? localize('config.mode_auto', this._language)
-                : localize('config.mode_manual', this._language)
-              }
-            </div>
-          </div>
+        <div class="form-group">
+          <ha-select
+            label="${localize('config.selection_mode', this._language)}"
+            .value=${this._selection_mode}
+            @selected=${this._onModeChange}
+            helper-text="${localize('config.selection_mode_description', this._language)}"
+          >
+            <mwc-list-item value="manual">${localize('config.mode_manual', this._language)}</mwc-list-item>
+            <mwc-list-item value="auto" .disabled=${!hasEntityDevices}>
+              ${localize('config.mode_auto', this._language)}
+            </mwc-list-item>
+            <mwc-list-item value="device" .disabled=${!hasHADevices}>
+              ${localize('config.mode_device', this._language)}
+            </mwc-list-item>
+          </ha-select>
         </div>
         
-        ${!hasDevices ? html`
-          <ha-alert alert-type="warning">
-            ${localize('config.no_devices_found', this._language)}
-          </ha-alert>
-        ` : html`
-          <div class="devices-info">
-            ${localize('config.devices_found', this._language, { 
-              count: this._availableDevices.length 
-            })}
-          </div>
-        `}
+        <div class="device-status">
+          ${!hasEntityDevices && !hasHADevices ? html`
+            <ha-alert alert-type="warning">
+              ${localize('config.no_devices_found', this._language)} & ${localize('config.no_ha_devices_found', this._language)}
+            </ha-alert>
+          ` : html`
+            <div class="devices-info">
+              ${hasEntityDevices ? html`
+                <div>📊 ${localize('config.devices_found', this._language, { 
+                  count: this._availableDevices.length 
+                })}</div>
+              ` : ''}
+              ${hasHADevices ? html`
+                <div>🔧 ${localize('config.ha_devices_found', this._language, { 
+                  count: this._availableHADevices.length 
+                })}</div>
+              ` : ''}
+            </div>
+          `}
+        </div>
       </div>
     `;
   }
@@ -224,6 +296,37 @@ export class TeddyCardEditor extends LitElement {
           <div class="auto-detected-info">
             <h4>${localize('config.entity_validation', this._language)}</h4>
             ${this._renderEntityValidation()}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  _renderDeviceModeConfig() {
+    const suggestedDevices = getSuggestedDevices(this.hass);
+    
+    return html`
+      <div class="device-config">
+        <div class="form-group">
+          <ha-select
+            label="${localize('config.device_source', this._language)}"
+            .value=${this._selectedDevice}
+            @selected=${this._onDeviceSelect}
+            helper-text="${localize('config.device_source_description', this._language)}"
+          >
+            <mwc-list-item value="">-- Select Device --</mwc-list-item>
+            ${suggestedDevices.map(device => html`
+              <mwc-list-item value="${device.value}">
+                ${device.label}
+              </mwc-list-item>
+            `)}
+          </ha-select>
+        </div>
+
+        ${this._selectedDevice ? html`
+          <div class="device-info">
+            <h4>${localize('config.device_validation', this._language)}</h4>
+            ${this._renderDeviceValidation()}
           </div>
         ` : ''}
       </div>
@@ -312,6 +415,62 @@ export class TeddyCardEditor extends LitElement {
     `;
   }
 
+  _renderDeviceValidation() {
+    if (!this._selectedDevice) {
+      return html`<div class="no-validation">Select device to validate configuration</div>`;
+    }
+
+    const validation = validateDeviceConfiguration(this.hass, this._selectedDevice);
+    
+    return html`
+      <div class="device-validation">
+        ${validation.valid ? html`
+          <ha-alert alert-type="success">
+            ${localize('config.device_valid', this._language)}
+          </ha-alert>
+        ` : html`
+          <ha-alert alert-type="warning">
+            ${localize('config.device_invalid', this._language)} - ${localize('config.entities_missing', this._language, {
+              count: validation.missing.length,
+              total: validation.totalExpected
+            })}
+          </ha-alert>
+        `}
+        
+        <div class="device-info-details">
+          <h5>🔧 Device: ${validation.device?.name}</h5>
+          <div class="device-properties">
+            <div><strong>ID:</strong> ${validation.device?.id}</div>
+            <div><strong>Model:</strong> ${validation.device?.model}</div>
+            <div><strong>Manufacturer:</strong> ${validation.device?.manufacturer}</div>
+          </div>
+        </div>
+        
+        <div class="entity-status">
+          <div class="found-entities">
+            <h5>✅ Available (${validation.foundCount})</h5>
+            <ul>
+              ${validation.available.map(entity => html`
+                <li><code>${entity.entityId}</code></li>
+              `)}
+            </ul>
+          </div>
+          
+          ${validation.missing.length > 0 ? html`
+            <div class="missing-entities">
+              <h5>❌ Missing (${validation.missing.length})</h5>
+              <ul>
+                ${validation.missing.map(entity => html`
+                  <li><code>${entity.entityId}</code></li>
+                `)}
+              </ul>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+
   render() {
     if (!this.hass) {
       return html``;
@@ -323,7 +482,9 @@ export class TeddyCardEditor extends LitElement {
         
         ${this._isAutoMode() 
           ? this._renderAutoModeConfig() 
-          : this._renderManualModeConfig()
+          : this._isDeviceMode()
+            ? this._renderDeviceModeConfig()
+            : this._renderManualModeConfig()
         }
 
         <div class="form-group">
@@ -340,19 +501,19 @@ export class TeddyCardEditor extends LitElement {
         </div>
 
         <div class="validation-summary">
-          ${(!this._toniebox_id && !this._isAutoMode()) ? html`
+          ${(!this._toniebox_id && this._isManualMode()) ? html`
             <ha-alert alert-type="error">
               ${localize('errors.missing_toniebox_id', this._language)}
             </ha-alert>
           ` : ''}
           
-          ${(!this._toniebox_name && !this._isAutoMode()) ? html`
+          ${(!this._toniebox_name && this._isManualMode()) ? html`
             <ha-alert alert-type="error">
               ${localize('errors.missing_toniebox_name', this._language)}
             </ha-alert>
           ` : ''}
 
-          ${(this._toniebox_id && this._toniebox_name) || this._isAutoMode() ? html`
+          ${(this._toniebox_id && this._toniebox_name) || !this._isManualMode() ? html`
             <ha-alert alert-type="success">
               Configuration is valid! 🎉
             </ha-alert>
@@ -409,7 +570,8 @@ export class TeddyCardEditor extends LitElement {
       }
 
       .auto-config,
-      .manual-config {
+      .manual-config,
+      .device-config {
         background: var(--card-background-color);
         border-radius: 8px;
         padding: 16px;
@@ -418,20 +580,40 @@ export class TeddyCardEditor extends LitElement {
       }
 
       .auto-detected-info,
-      .validation-info {
+      .validation-info,
+      .device-info {
         margin-top: 16px;
       }
 
       .auto-detected-info h4,
-      .validation-info h4 {
+      .validation-info h4,
+      .device-info h4 {
         margin: 0 0 12px 0;
         color: var(--primary-text-color);
       }
 
-      .entity-validation {
+      .entity-validation,
+      .device-validation {
         background: var(--code-editor-background-color, #f8f9fa);
         border-radius: 8px;
         padding: 12px;
+      }
+
+      .device-info-details {
+        margin-bottom: 16px;
+        padding: 8px;
+        background: var(--card-background-color);
+        border-radius: 4px;
+        border-left: 4px solid var(--primary-color);
+      }
+
+      .device-properties {
+        margin-top: 8px;
+        font-size: 14px;
+      }
+
+      .device-properties div {
+        margin-bottom: 4px;
       }
 
       .entity-status {
