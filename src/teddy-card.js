@@ -19,6 +19,17 @@ export class TeddyCard extends LitElement {
     };
   }
   
+  constructor() {
+    super();
+    // Ensure config is always defined with defaults
+    this.config = {
+      language: 'en',
+      entity_source: '',
+      toniebox_id: '',
+      toniebox_name: ''
+    };
+  }
+  
   updated(changedProperties) {
     super.updated(changedProperties);
     
@@ -99,7 +110,7 @@ export class TeddyCard extends LitElement {
           <ha-icon icon="mdi:alert-circle" class="state-icon"></ha-icon>
           <div class="entity-info">
             <span class="entity-name">${name}</span>
-            <span class="entity-state unavailable">${localize('errors.entity_not_found', this.config.language)}</span>
+            <span class="entity-state unavailable">${localize('errors.entity_not_found', this.config?.language || 'en')}</span>
           </div>
         </div>
       `;
@@ -180,7 +191,7 @@ export class TeddyCard extends LitElement {
       return html``;
     }
 
-    const lang = this.config.language || 'en';
+    const lang = this.config?.language || 'en';
     
     // Get all expected entities
     const entities = this._getExpectedEntities();

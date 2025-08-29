@@ -18,6 +18,19 @@ export class TeddyCardEditor extends LitElement {
     };
   }
 
+  constructor() {
+    super();
+    // Ensure config is always defined with defaults
+    this.config = {
+      toniebox_id: '',
+      toniebox_name: '',
+      language: 'en',
+      entity_source: ''
+    };
+    this._availableDevices = [];
+    this._selectedEntity = '';
+  }
+
   setConfig(config) {
     // Set defaults for simplified entity-based configuration
     this.config = { 
@@ -54,19 +67,19 @@ export class TeddyCardEditor extends LitElement {
   }
 
   get _toniebox_id() {
-    return this.config.toniebox_id || '';
+    return this.config?.toniebox_id || '';
   }
 
   get _toniebox_name() {
-    return this.config.toniebox_name || '';
+    return this.config?.toniebox_name || '';
   }
 
   get _language() {
-    return this.config.language || 'en';
+    return this.config?.language || 'en';
   }
 
   get _entity_source() {
-    return this.config.entity_source || '';
+    return this.config?.entity_source || '';
   }
 
 
@@ -77,7 +90,9 @@ export class TeddyCardEditor extends LitElement {
     if (entityId && this.hass) {
       try {
         const autoConfig = createConfigFromEntity(this.hass, entityId);
-        if (autoConfig) {
+        console.debug('Auto config from entity:', autoConfig);
+        
+        if (autoConfig && typeof autoConfig === 'object') {
           // Ensure we have a valid base config to spread from
           const baseConfig = this.config || { language: 'en' };
           const newConfig = {
@@ -85,11 +100,24 @@ export class TeddyCardEditor extends LitElement {
             ...autoConfig,
             language: this._language
           };
+          
+          console.debug('Final config to update:', newConfig);
           this._updateConfig(newConfig);
+        } else {
+          console.warn('Invalid autoConfig received:', autoConfig);
         }
       } catch (error) {
         console.error('Could not create config from entity:', error);
       }
+    } else if (!entityId) {
+      // Clear config when no entity selected
+      const clearedConfig = {
+        ...this.config,
+        entity_source: '',
+        toniebox_id: '',
+        toniebox_name: ''
+      };
+      this._updateConfig(clearedConfig);
     }
   }
 
@@ -125,11 +153,19 @@ export class TeddyCardEditor extends LitElement {
       return;
     }
     
-    // Ensure the config has required properties
+    // Ensure the config has required properties and filter out undefined values
     const validatedConfig = {
-      language: 'en',
-      ...newConfig
+      language: 'en'
     };
+    
+    // Only add properties that are not undefined
+    Object.keys(newConfig).forEach(key => {
+      if (newConfig[key] !== undefined) {
+        validatedConfig[key] = newConfig[key];
+      }
+    });
+    
+    console.debug('Updating config:', validatedConfig);
     
     const messageEvent = new Event('config-changed', {
       detail: { config: validatedConfig },
