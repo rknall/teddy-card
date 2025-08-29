@@ -3,7 +3,7 @@ import { localize } from './localize.js';
 import { validateTonieboxEntities, extractBoxIdFromEntity, getExpectedEntities, extractDeviceName } from './utils.js';
 import './editor.js';
 
-const CARD_VERSION = '0.3.0';
+const CARD_VERSION = '0.3.2';
 
 console.info(
   `%c TEDDY-CARD %c v${CARD_VERSION} `,
