@@ -1,21 +1,61 @@
 import { LitElement, html, css } from 'lit';
 import { localize } from './localize.js';
+import { 
+  findTeddyCloudDevices, 
+  getSuggestedEntities, 
+  createConfigFromEntity,
+  validateTonieboxEntities,
+  extractBoxIdFromEntity
+} from './utils.js';
 
 export class TeddyCardEditor extends LitElement {
   static get properties() {
     return {
       hass: {},
-      config: {}
+      config: {},
+      _availableDevices: { type: Array },
+      _selectedEntity: { type: String }
     };
   }
 
   setConfig(config) {
+    // Set defaults and ensure backward compatibility
     this.config = { 
       toniebox_id: '',
       toniebox_name: '',
       language: 'en',
+      selection_mode: 'manual', // Default to manual for backward compatibility
+      entity_source: '',
       ...config 
     };
+    
+    // Auto-detect if we have entity_source but no selection_mode
+    if (this.config.entity_source && !config.selection_mode) {
+      this.config.selection_mode = 'auto';
+    }
+    
+    this._selectedEntity = this.config.entity_source || '';
+    this._updateAvailableDevices();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._updateAvailableDevices();
+  }
+
+  updated(changedProperties) {
+    super.updated(changedProperties);
+    
+    if (changedProperties.has('hass')) {
+      this._updateAvailableDevices();
+    }
+  }
+
+  _updateAvailableDevices() {
+    if (this.hass) {
+      const devices = findTeddyCloudDevices(this.hass);
+      this._availableDevices = Array.from(devices.values());
+    }
   }
 
   get _toniebox_id() {
@@ -30,13 +70,169 @@ export class TeddyCardEditor extends LitElement {
     return this.config.language || 'en';
   }
 
-  render() {
-    if (!this.hass) {
-      return html``;
+  get _selection_mode() {
+    return this.config.selection_mode || 'manual';
+  }
+
+  get _entity_source() {
+    return this.config.entity_source || '';
+  }
+
+  _isAutoMode() {
+    return this._selection_mode === 'auto';
+  }
+
+  _onModeToggle(ev) {
+    const newMode = ev.target.checked ? 'auto' : 'manual';
+    
+    if (newMode === 'auto' && this._availableDevices.length > 0) {
+      // Auto-select first available device if switching to auto mode
+      const firstDevice = this._availableDevices[0];
+      const firstEntity = firstDevice.sampleEntity;
+      this._selectedEntity = firstEntity;
+      
+      try {
+        const autoConfig = createConfigFromEntity(this.hass, firstEntity);
+        this._updateConfig({
+          ...autoConfig,
+          selection_mode: 'auto',
+          language: this._language
+        });
+      } catch (error) {
+        console.warn('Could not auto-configure from entity:', error);
+      }
+    } else if (newMode === 'manual') {
+      this._updateConfig({
+        ...this.config,
+        selection_mode: 'manual',
+        entity_source: ''
+      });
+      this._selectedEntity = '';
+    }
+  }
+
+  _onEntitySelect(ev) {
+    const entityId = ev.target.value;
+    this._selectedEntity = entityId;
+    
+    if (entityId && this._isAutoMode()) {
+      try {
+        const autoConfig = createConfigFromEntity(this.hass, entityId);
+        this._updateConfig({
+          ...autoConfig,
+          language: this._language
+        });
+      } catch (error) {
+        console.error('Could not create config from entity:', error);
+      }
+    }
+  }
+
+  _valueChanged(ev) {
+    if (!this.config || !this.hass) {
+      return;
+    }
+    
+    const target = ev.target;
+    const configValue = target.configValue;
+    const value = target.value;
+
+    if (this[`_${configValue}`] === value) {
+      return;
     }
 
+    const newConfig = { ...this.config };
+    if (configValue) {
+      if (value === '' || value === undefined) {
+        delete newConfig[configValue];
+      } else {
+        newConfig[configValue] = value;
+      }
+    }
+
+    this._updateConfig(newConfig);
+  }
+
+  _updateConfig(newConfig) {
+    const messageEvent = new Event('config-changed', {
+      detail: { config: newConfig },
+      bubbles: true,
+      composed: true,
+    });
+    this.dispatchEvent(messageEvent);
+  }
+
+  _renderModeToggle() {
+    const hasDevices = this._availableDevices && this._availableDevices.length > 0;
+    
     return html`
-      <div class="card-config">
+      <div class="mode-toggle">
+        <div class="toggle-container">
+          <ha-switch
+            .checked=${this._isAutoMode()}
+            .disabled=${!hasDevices}
+            @change=${this._onModeToggle}
+          ></ha-switch>
+          <div class="toggle-label">
+            <strong>${localize('config.selection_mode', this._language)}</strong>
+            <div class="toggle-description">
+              ${this._isAutoMode() 
+                ? localize('config.mode_auto', this._language)
+                : localize('config.mode_manual', this._language)
+              }
+            </div>
+          </div>
+        </div>
+        
+        ${!hasDevices ? html`
+          <ha-alert alert-type="warning">
+            ${localize('config.no_devices_found', this._language)}
+          </ha-alert>
+        ` : html`
+          <div class="devices-info">
+            ${localize('config.devices_found', this._language, { 
+              count: this._availableDevices.length 
+            })}
+          </div>
+        `}
+      </div>
+    `;
+  }
+
+  _renderAutoModeConfig() {
+    const suggestedEntities = getSuggestedEntities(this.hass);
+    
+    return html`
+      <div class="auto-config">
+        <div class="form-group">
+          <ha-select
+            label="${localize('config.entity_source', this._language)}"
+            .value=${this._selectedEntity}
+            @selected=${this._onEntitySelect}
+            helper-text="${localize('config.entity_source_description', this._language)}"
+          >
+            <mwc-list-item value="">-- Select Entity --</mwc-list-item>
+            ${suggestedEntities.map(entity => html`
+              <mwc-list-item value="${entity.value}">
+                ${entity.label}
+              </mwc-list-item>
+            `)}
+          </ha-select>
+        </div>
+
+        ${this._selectedEntity ? html`
+          <div class="auto-detected-info">
+            <h4>${localize('config.entity_validation', this._language)}</h4>
+            ${this._renderEntityValidation()}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  _renderManualModeConfig() {
+    return html`
+      <div class="manual-config">
         <div class="form-group">
           <ha-textfield
             label="${localize('config.toniebox_id', this._language)}"
@@ -59,6 +255,77 @@ export class TeddyCardEditor extends LitElement {
           ></ha-textfield>
         </div>
 
+        ${this._toniebox_id ? html`
+          <div class="validation-info">
+            <h4>${localize('config.entity_validation', this._language)}</h4>
+            ${this._renderEntityValidation()}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  _renderEntityValidation() {
+    if (!this._toniebox_id) {
+      return html`<div class="no-validation">Enter Toniebox ID to validate entities</div>`;
+    }
+
+    const validation = validateTonieboxEntities(this.hass, this._toniebox_id);
+    
+    return html`
+      <div class="entity-validation">
+        ${validation.valid ? html`
+          <ha-alert alert-type="success">
+            ${localize('config.entities_all_found', this._language)}
+          </ha-alert>
+        ` : html`
+          <ha-alert alert-type="warning">
+            ${localize('config.entities_missing', this._language, {
+              count: validation.missing.length,
+              total: validation.totalExpected
+            })}
+          </ha-alert>
+        `}
+        
+        <div class="entity-status">
+          <div class="found-entities">
+            <h5>✅ Available (${validation.foundCount})</h5>
+            <ul>
+              ${validation.available.map(entity => html`
+                <li><code>${entity.entityId}</code></li>
+              `)}
+            </ul>
+          </div>
+          
+          ${validation.missing.length > 0 ? html`
+            <div class="missing-entities">
+              <h5>❌ Missing (${validation.missing.length})</h5>
+              <ul>
+                ${validation.missing.map(entity => html`
+                  <li><code>${entity.entityId}</code></li>
+                `)}
+              </ul>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  render() {
+    if (!this.hass) {
+      return html``;
+    }
+
+    return html`
+      <div class="card-config">
+        ${this._renderModeToggle()}
+        
+        ${this._isAutoMode() 
+          ? this._renderAutoModeConfig() 
+          : this._renderManualModeConfig()
+        }
+
         <div class="form-group">
           <ha-select
             label="${localize('config.language', this._language)}"
@@ -72,76 +339,27 @@ export class TeddyCardEditor extends LitElement {
           </ha-select>
         </div>
 
-        ${this._toniebox_id ? html`
-          <div class="entity-preview">
-            <h3>Entity Preview</h3>
-            <p>The following entities will be used:</p>
-            <ul>
-              <li><code>image.teddycloud_box_${this._toniebox_id}_content_picture</code></li>
-              <li><code>sensor.teddycloud_box_${this._toniebox_id}_content_title</code></li>
-              <li><code>sensor.teddycloud_box_${this._toniebox_id}_tag_valid</code></li>
-              <li><code>binary_sensor.teddycloud_box_${this._toniebox_id}_charger</code></li>
-              <li><code>sensor.teddycloud_box_${this._toniebox_id}_volume_db</code></li>
-              <li><code>sensor.teddycloud_box_${this._toniebox_id}_volume_level</code></li>
-              <li><code>event.teddycloud_box_${this._toniebox_id}_volume_down</code></li>
-              <li><code>event.teddycloud_box_${this._toniebox_id}_volume_up</code></li>
-              <li><code>sensor.teddycloud_box_${this._toniebox_id}_content_audio_id</code></li>
-              <li><code>switch.teddycloud_server_cloud_cachecontent_cache_cloud_content_on_local_server</code></li>
-              <li><code>switch.teddycloud_server_cloud_enabled_generally_enable_cloud_operation</code></li>
-            </ul>
-          </div>
-        ` : ''}
-
-        <div class="validation-info">
-          ${!this._toniebox_id ? html`
+        <div class="validation-summary">
+          ${(!this._toniebox_id && !this._isAutoMode()) ? html`
             <ha-alert alert-type="error">
               ${localize('errors.missing_toniebox_id', this._language)}
             </ha-alert>
           ` : ''}
           
-          ${!this._toniebox_name ? html`
+          ${(!this._toniebox_name && !this._isAutoMode()) ? html`
             <ha-alert alert-type="error">
               ${localize('errors.missing_toniebox_name', this._language)}
             </ha-alert>
           ` : ''}
 
-          ${this._toniebox_id && this._toniebox_name ? html`
+          ${(this._toniebox_id && this._toniebox_name) || this._isAutoMode() ? html`
             <ha-alert alert-type="success">
-              Configuration is valid!
+              Configuration is valid! 🎉
             </ha-alert>
           ` : ''}
         </div>
       </div>
     `;
-  }
-
-  _valueChanged(ev) {
-    if (!this.config || !this.hass) {
-      return;
-    }
-    const target = ev.target;
-    const configValue = target.configValue;
-    const value = target.value;
-
-    if (this[`_${configValue}`] === value) {
-      return;
-    }
-
-    const newConfig = { ...this.config };
-    if (configValue) {
-      if (value === '' || value === undefined) {
-        delete newConfig[configValue];
-      } else {
-        newConfig[configValue] = value;
-      }
-    }
-
-    const messageEvent = new Event('config-changed', {
-      detail: { config: newConfig },
-      bubbles: true,
-      composed: true,
-    });
-    this.dispatchEvent(messageEvent);
   }
 
   static get styles() {
@@ -159,44 +377,119 @@ export class TeddyCardEditor extends LitElement {
         width: 100%;
       }
 
-      .entity-preview {
-        background: var(--code-editor-background-color, #f8f9fa);
-        border: 1px solid var(--divider-color);
-        border-radius: 8px;
+      .mode-toggle {
+        margin-bottom: 24px;
         padding: 16px;
-        margin: 20px 0;
+        background: var(--card-background-color);
+        border-radius: 8px;
+        border: 1px solid var(--divider-color);
       }
 
-      .entity-preview h3 {
-        margin-top: 0;
+      .toggle-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+
+      .toggle-label {
+        flex: 1;
+      }
+
+      .toggle-description {
+        font-size: 14px;
+        color: var(--secondary-text-color);
+        margin-top: 4px;
+      }
+
+      .devices-info {
+        font-size: 14px;
+        color: var(--primary-text-color);
+        font-weight: 500;
+      }
+
+      .auto-config,
+      .manual-config {
+        background: var(--card-background-color);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+        border: 1px solid var(--divider-color);
+      }
+
+      .auto-detected-info,
+      .validation-info {
+        margin-top: 16px;
+      }
+
+      .auto-detected-info h4,
+      .validation-info h4 {
+        margin: 0 0 12px 0;
         color: var(--primary-text-color);
       }
 
-      .entity-preview ul {
+      .entity-validation {
+        background: var(--code-editor-background-color, #f8f9fa);
+        border-radius: 8px;
+        padding: 12px;
+      }
+
+      .entity-status {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 12px;
+      }
+
+      .found-entities h5,
+      .missing-entities h5 {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+      }
+
+      .found-entities h5 {
+        color: var(--success-color, #4caf50);
+      }
+
+      .missing-entities h5 {
+        color: var(--error-color, #f44336);
+      }
+
+      .entity-status ul {
         margin: 0;
-        padding-left: 20px;
+        padding-left: 16px;
+        font-size: 12px;
       }
 
-      .entity-preview li {
-        margin: 4px 0;
-        color: var(--secondary-text-color);
+      .entity-status li {
+        margin-bottom: 4px;
       }
 
-      .entity-preview code {
+      .entity-status code {
         background: var(--card-background-color);
         padding: 2px 4px;
         border-radius: 3px;
         font-family: 'Courier New', monospace;
-        font-size: 0.9em;
         color: var(--primary-text-color);
       }
 
-      .validation-info {
+      .validation-summary {
         margin-top: 20px;
       }
 
+      .no-validation {
+        font-style: italic;
+        color: var(--secondary-text-color);
+      }
+
       ha-alert {
-        margin-bottom: 10px;
+        margin-bottom: 12px;
+      }
+
+      @media (max-width: 600px) {
+        .entity-status {
+          grid-template-columns: 1fr;
+        }
       }
     `;
   }

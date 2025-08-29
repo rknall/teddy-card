@@ -1,8 +1,9 @@
 import { LitElement, html, css } from 'lit';
 import { localize } from './localize.js';
+import { validateTonieboxEntities, extractBoxIdFromEntity, getExpectedEntities, extractDeviceName } from './utils.js';
 import './editor.js';
 
-const CARD_VERSION = '1.0.0';
+const CARD_VERSION = '1.1.0';
 
 console.info(
   `%c TEDDY-CARD %c v${CARD_VERSION} `,
@@ -17,6 +18,15 @@ export class TeddyCard extends LitElement {
       config: {}
     };
   }
+  
+  updated(changedProperties) {
+    super.updated(changedProperties);
+    
+    // Update auto-detected name when hass changes
+    if (changedProperties.has('hass')) {
+      this._updateAutoDetectedName();
+    }
+  }
 
   static getConfigElement() {
     return document.createElement('teddy-card-editor');
@@ -26,36 +36,83 @@ export class TeddyCard extends LitElement {
     return {
       toniebox_id: '12345678',
       toniebox_name: 'My Toniebox',
-      language: 'en'
+      language: 'en',
+      selection_mode: 'manual'
     };
   }
 
   setConfig(config) {
-    if (!config.toniebox_id) {
-      throw new Error(localize('errors.missing_toniebox_id', config.language));
+    // Handle backward compatibility - existing configs without selection_mode
+    const normalizedConfig = { ...config };
+    
+    // If we have entity_source but no selection_mode, set to auto
+    if (normalizedConfig.entity_source && !normalizedConfig.selection_mode) {
+      normalizedConfig.selection_mode = 'auto';
     }
-    if (!config.toniebox_name) {
-      throw new Error(localize('errors.missing_toniebox_name', config.language));
+    
+    // If no selection_mode specified, default to manual for backward compatibility
+    if (!normalizedConfig.selection_mode) {
+      normalizedConfig.selection_mode = 'manual';
+    }
+    
+    // Handle auto mode - extract IDs from entity_source
+    if (normalizedConfig.selection_mode === 'auto' && normalizedConfig.entity_source) {
+      const boxId = extractBoxIdFromEntity(normalizedConfig.entity_source);
+      if (boxId) {
+        normalizedConfig.toniebox_id = boxId;
+        // Name will be set when hass is available
+      }
+    }
+    
+    // Validate based on mode
+    if (normalizedConfig.selection_mode === 'manual') {
+      if (!normalizedConfig.toniebox_id) {
+        throw new Error(localize('errors.missing_toniebox_id', normalizedConfig.language));
+      }
+      if (!normalizedConfig.toniebox_name) {
+        throw new Error(localize('errors.missing_toniebox_name', normalizedConfig.language));
+      }
+    } else if (normalizedConfig.selection_mode === 'auto') {
+      if (!normalizedConfig.entity_source) {
+        throw new Error('Entity source is required for auto mode');
+      }
+      if (!normalizedConfig.toniebox_id) {
+        throw new Error('Could not extract Toniebox ID from selected entity');
+      }
     }
     
     this.config = {
       language: 'en',
-      ...config
+      selection_mode: 'manual',
+      ...normalizedConfig
     };
+    
+    // Update name from entity if in auto mode and hass is available
+    this._updateAutoDetectedName();
+  }
+  
+  _updateAutoDetectedName() {
+    if (this.hass && this.config?.selection_mode === 'auto' && this.config?.entity_source) {
+      const entity = this.hass.states[this.config.entity_source];
+      if (entity && !this.config.toniebox_name) {
+        const name = extractDeviceName(entity, this.config.toniebox_id);
+        if (name !== this.config.toniebox_name) {
+          this.config = { ...this.config, toniebox_name: name };
+          this.requestUpdate();
+        }
+      }
+    }
   }
 
   getCardSize() {
     return 7;
   }
 
-  _getEntityId(entityType, suffix = '') {
-    const id = this.config.toniebox_id;
-    const suffixPart = suffix ? `_${suffix}` : '';
-    return `${entityType}.teddycloud_box_${id}${suffixPart}`;
-  }
-
-  _getServerEntityId(suffix) {
-    return `switch.teddycloud_server_${suffix}`;
+  _getExpectedEntities() {
+    if (!this.config?.toniebox_id) {
+      return {};
+    }
+    return getExpectedEntities(this.config.toniebox_id);
   }
 
   _renderEntityRow(entityId, name, icon = null) {
@@ -99,22 +156,26 @@ export class TeddyCard extends LitElement {
 
     const lang = this.config.language || 'en';
     
-    // Entity IDs
-    const contentPictureId = this._getEntityId('image', 'content_picture');
-    const contentTitleId = this._getEntityId('sensor', 'content_title');
-    const tagValidId = this._getEntityId('sensor', 'tag_valid');
-    const chargerId = this._getEntityId('binary_sensor', 'charger');
-    const volumeDbId = this._getEntityId('sensor', 'volume_db');
-    const volumeLevelId = this._getEntityId('sensor', 'volume_level');
-    const volumeDownId = this._getEntityId('event', 'volume_down');
-    const volumeUpId = this._getEntityId('event', 'volume_up');
-    const contentAudioId = this._getEntityId('sensor', 'content_audio_id');
-    const cacheContentId = this._getServerEntityId('cloud_cachecontent_cache_cloud_content_on_local_server');
-    const enableCloudId = this._getServerEntityId('cloud_enabled_generally_enable_cloud_operation');
+    // Get all expected entities
+    const entities = this._getExpectedEntities();
+    
+    if (!entities || Object.keys(entities).length === 0) {
+      return html`
+        <ha-card>
+          <div class="card-content error">
+            <ha-icon icon="mdi:alert-circle" class="error-icon"></ha-icon>
+            <div class="error-message">
+              <h3>Configuration Error</h3>
+              <p>Missing Toniebox ID. Please configure the card.</p>
+            </div>
+          </div>
+        </ha-card>
+      `;
+    }
 
     // Get entities
-    const contentPictureEntity = this.hass.states[contentPictureId];
-    const contentTitleEntity = this.hass.states[contentTitleId];
+    const contentPictureEntity = this.hass.states[entities.contentPicture];
+    const contentTitleEntity = this.hass.states[entities.contentTitle];
 
     return html`
       <ha-card header="${this.config.toniebox_name}">
@@ -131,26 +192,26 @@ export class TeddyCard extends LitElement {
 
           <!-- Content Title -->
           <div class="title-section">
-            ${this._renderEntityRow(contentTitleId, localize('title', lang), 'mdi:music')}
+            ${this._renderEntityRow(entities.contentTitle, localize('title', lang), 'mdi:music')}
           </div>
 
           <!-- Main Entities -->
           <div class="entities-section">
             <h3>${this.config.toniebox_name}</h3>
-            ${this._renderEntityRow(tagValidId, localize('tag_uid', lang), 'mdi:tag')}
-            ${this._renderEntityRow(chargerId, localize('charging_station', lang), 'mdi:battery-charging')}
-            ${this._renderEntityRow(volumeDbId, localize('volume_db', lang), 'mdi:volume-high')}
-            ${this._renderEntityRow(volumeLevelId, localize('volume_level', lang), 'mdi:volume-medium')}
-            ${this._renderEntityRow(volumeDownId, localize('small_ear_quieter', lang), 'mdi:ear-hearing-off')}
-            ${this._renderEntityRow(volumeUpId, localize('big_ear_louder', lang), 'mdi:ear-hearing')}
-            ${this._renderEntityRow(contentAudioId, localize('content_audio_id', lang), 'mdi:identifier')}
+            ${this._renderEntityRow(entities.tagValid, localize('tag_uid', lang), 'mdi:tag')}
+            ${this._renderEntityRow(entities.charger, localize('charging_station', lang), 'mdi:battery-charging')}
+            ${this._renderEntityRow(entities.volumeDb, localize('volume_db', lang), 'mdi:volume-high')}
+            ${this._renderEntityRow(entities.volumeLevel, localize('volume_level', lang), 'mdi:volume-medium')}
+            ${this._renderEntityRow(entities.volumeDown, localize('small_ear_quieter', lang), 'mdi:ear-hearing-off')}
+            ${this._renderEntityRow(entities.volumeUp, localize('big_ear_louder', lang), 'mdi:ear-hearing')}
+            ${this._renderEntityRow(entities.contentAudioId, localize('content_audio_id', lang), 'mdi:identifier')}
           </div>
 
           <!-- Server Settings -->
           <div class="entities-section">
             <h3>TeddyCloud Server</h3>
-            ${this._renderEntityRow(cacheContentId, localize('cache_cloud_content', lang), 'mdi:cloud-download')}
-            ${this._renderEntityRow(enableCloudId, localize('enable_cloud_operation', lang), 'mdi:cloud')}
+            ${this._renderEntityRow(entities.cacheContent, localize('cache_cloud_content', lang), 'mdi:cloud-download')}
+            ${this._renderEntityRow(entities.enableCloud, localize('enable_cloud_operation', lang), 'mdi:cloud')}
           </div>
         </div>
       </ha-card>
@@ -169,6 +230,29 @@ export class TeddyCard extends LitElement {
 
       .card-content {
         padding: 0;
+      }
+
+      .card-content.error {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px;
+        text-align: left;
+      }
+
+      .error-icon {
+        --mdc-icon-size: 32px;
+        color: var(--error-color, #f44336);
+      }
+
+      .error-message h3 {
+        margin: 0 0 8px 0;
+        color: var(--error-color, #f44336);
+      }
+
+      .error-message p {
+        margin: 0;
+        color: var(--secondary-text-color);
       }
 
       .picture-section {
