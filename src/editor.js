@@ -5,11 +5,7 @@ import {
   getSuggestedEntities, 
   createConfigFromEntity,
   validateTonieboxEntities,
-  extractBoxIdFromEntity,
-  getSuggestedDevices,
-  createConfigFromDevice,
-  validateDeviceConfiguration,
-  findTeddyCloudHADevices
+  extractBoxIdFromEntity
 } from './utils.js';
 
 export class TeddyCardEditor extends LitElement {
@@ -18,21 +14,18 @@ export class TeddyCardEditor extends LitElement {
       hass: {},
       config: {},
       _availableDevices: { type: Array },
-      _availableHADevices: { type: Array },
-      _selectedEntity: { type: String },
-      _selectedDevice: { type: String }
+      _selectedEntity: { type: String }
     };
   }
 
   setConfig(config) {
-    // Set defaults and ensure backward compatibility
+    // Set defaults - prefer auto mode as primary
     this.config = { 
       toniebox_id: '',
       toniebox_name: '',
       language: 'en',
-      selection_mode: 'manual', // Default to manual for backward compatibility
+      selection_mode: 'auto', // Default to auto mode 
       entity_source: '',
-      device_source: '',
       ...config 
     };
     
@@ -41,13 +34,7 @@ export class TeddyCardEditor extends LitElement {
       this.config.selection_mode = 'auto';
     }
     
-    // Auto-detect if we have device_source but no selection_mode  
-    if (this.config.device_source && !config.selection_mode) {
-      this.config.selection_mode = 'device';
-    }
-    
     this._selectedEntity = this.config.entity_source || '';
-    this._selectedDevice = this.config.device_source || '';
     this._updateAvailableDevices();
   }
 
@@ -69,9 +56,6 @@ export class TeddyCardEditor extends LitElement {
       // Entity-based devices (from entity discovery)
       const devices = findTeddyCloudDevices(this.hass);
       this._availableDevices = Array.from(devices.values());
-      
-      // HA device registry devices (for device mode)
-      this._availableHADevices = findTeddyCloudHADevices(this.hass);
     }
   }
 
@@ -95,16 +79,8 @@ export class TeddyCardEditor extends LitElement {
     return this.config.entity_source || '';
   }
 
-  get _device_source() {
-    return this.config.device_source || '';
-  }
-
   _isAutoMode() {
     return this._selection_mode === 'auto';
-  }
-
-  _isDeviceMode() {
-    return this._selection_mode === 'device';
   }
 
   _isManualMode() {
@@ -114,45 +90,32 @@ export class TeddyCardEditor extends LitElement {
   _onModeChange(ev) {
     const newMode = ev.target.value;
     
-    if (newMode === 'auto' && this._availableDevices.length > 0) {
+    if (newMode === 'auto' && this._availableDevices && this._availableDevices.length > 0) {
       // Auto-select first available device if switching to auto mode
       const firstDevice = this._availableDevices[0];
-      const firstEntity = firstDevice.sampleEntity;
-      this._selectedEntity = firstEntity;
+      const firstEntity = firstDevice?.sampleEntity;
       
-      try {
-        const autoConfig = createConfigFromEntity(this.hass, firstEntity);
-        this._updateConfig({
-          ...autoConfig,
-          selection_mode: 'auto',
-          language: this._language
-        });
-      } catch (error) {
-        console.warn('Could not auto-configure from entity:', error);
-      }
-    } else if (newMode === 'device' && this._availableHADevices.length > 0) {
-      // Auto-select first available HA device if switching to device mode
-      const firstDevice = this._availableHADevices[0];
-      this._selectedDevice = firstDevice.device_id;
-      
-      try {
-        const deviceConfig = createConfigFromDevice(this.hass, firstDevice.device_id);
-        this._updateConfig({
-          ...deviceConfig,
-          language: this._language
-        });
-      } catch (error) {
-        console.warn('Could not auto-configure from device:', error);
+      if (firstEntity) {
+        this._selectedEntity = firstEntity;
+        
+        try {
+          const autoConfig = createConfigFromEntity(this.hass, firstEntity);
+          this._updateConfig({
+            ...autoConfig,
+            selection_mode: 'auto',
+            language: this._language
+          });
+        } catch (error) {
+          console.warn('Could not auto-configure from entity:', error);
+        }
       }
     } else if (newMode === 'manual') {
       this._updateConfig({
         ...this.config,
         selection_mode: 'manual',
-        entity_source: '',
-        device_source: ''
+        entity_source: ''
       });
       this._selectedEntity = '';
-      this._selectedDevice = '';
     }
   }
 
@@ -173,22 +136,6 @@ export class TeddyCardEditor extends LitElement {
     }
   }
 
-  _onDeviceSelect(ev) {
-    const deviceId = ev.target.value;
-    this._selectedDevice = deviceId;
-    
-    if (deviceId && this._isDeviceMode()) {
-      try {
-        const deviceConfig = createConfigFromDevice(this.hass, deviceId);
-        this._updateConfig({
-          ...deviceConfig,
-          language: this._language
-        });
-      } catch (error) {
-        console.error('Could not create config from device:', error);
-      }
-    }
-  }
 
   _valueChanged(ev) {
     if (!this.config || !this.hass) {
@@ -226,47 +173,37 @@ export class TeddyCardEditor extends LitElement {
 
   _renderModeToggle() {
     const hasEntityDevices = this._availableDevices && this._availableDevices.length > 0;
-    const hasHADevices = this._availableHADevices && this._availableHADevices.length > 0;
     
     return html`
       <div class="mode-toggle">
-        <div class="form-group">
-          <ha-select
-            label="${localize('config.selection_mode', this._language)}"
-            .value=${this._selection_mode}
-            @selected=${this._onModeChange}
-            helper-text="${localize('config.selection_mode_description', this._language)}"
-          >
-            <mwc-list-item value="manual">${localize('config.mode_manual', this._language)}</mwc-list-item>
-            <mwc-list-item value="auto" .disabled=${!hasEntityDevices}>
-              ${localize('config.mode_auto', this._language)}
-            </mwc-list-item>
-            <mwc-list-item value="device" .disabled=${!hasHADevices}>
-              ${localize('config.mode_device', this._language)}
-            </mwc-list-item>
-          </ha-select>
+        <div class="toggle-container">
+          <ha-switch
+            .checked=${this._isAutoMode()}
+            .disabled=${!hasEntityDevices}
+            @change=${(ev) => this._onModeChange({target: {value: ev.target.checked ? 'auto' : 'manual'}})}
+          ></ha-switch>
+          <div class="toggle-label">
+            <strong>${localize('config.selection_mode', this._language)}</strong>
+            <div class="toggle-description">
+              ${this._isAutoMode() 
+                ? localize('config.mode_auto', this._language)
+                : localize('config.mode_manual', this._language)
+              }
+            </div>
+          </div>
         </div>
         
-        <div class="device-status">
-          ${!hasEntityDevices && !hasHADevices ? html`
-            <ha-alert alert-type="warning">
-              ${localize('config.no_devices_found', this._language)} & ${localize('config.no_ha_devices_found', this._language)}
-            </ha-alert>
-          ` : html`
-            <div class="devices-info">
-              ${hasEntityDevices ? html`
-                <div>📊 ${localize('config.devices_found', this._language, { 
-                  count: this._availableDevices.length 
-                })}</div>
-              ` : ''}
-              ${hasHADevices ? html`
-                <div>🔧 ${localize('config.ha_devices_found', this._language, { 
-                  count: this._availableHADevices.length 
-                })}</div>
-              ` : ''}
-            </div>
-          `}
-        </div>
+        ${!hasEntityDevices ? html`
+          <ha-alert alert-type="warning">
+            ${localize('config.no_devices_found', this._language)}
+          </ha-alert>
+        ` : html`
+          <div class="devices-info">
+            ${localize('config.devices_found', this._language, { 
+              count: this._availableDevices.length 
+            })}
+          </div>
+        `}
       </div>
     `;
   }
@@ -302,36 +239,6 @@ export class TeddyCardEditor extends LitElement {
     `;
   }
 
-  _renderDeviceModeConfig() {
-    const suggestedDevices = getSuggestedDevices(this.hass);
-    
-    return html`
-      <div class="device-config">
-        <div class="form-group">
-          <ha-select
-            label="${localize('config.device_source', this._language)}"
-            .value=${this._selectedDevice}
-            @selected=${this._onDeviceSelect}
-            helper-text="${localize('config.device_source_description', this._language)}"
-          >
-            <mwc-list-item value="">-- Select Device --</mwc-list-item>
-            ${suggestedDevices.map(device => html`
-              <mwc-list-item value="${device.value}">
-                ${device.label}
-              </mwc-list-item>
-            `)}
-          </ha-select>
-        </div>
-
-        ${this._selectedDevice ? html`
-          <div class="device-info">
-            <h4>${localize('config.device_validation', this._language)}</h4>
-            ${this._renderDeviceValidation()}
-          </div>
-        ` : ''}
-      </div>
-    `;
-  }
 
   _renderManualModeConfig() {
     return html`
@@ -415,61 +322,6 @@ export class TeddyCardEditor extends LitElement {
     `;
   }
 
-  _renderDeviceValidation() {
-    if (!this._selectedDevice) {
-      return html`<div class="no-validation">Select device to validate configuration</div>`;
-    }
-
-    const validation = validateDeviceConfiguration(this.hass, this._selectedDevice);
-    
-    return html`
-      <div class="device-validation">
-        ${validation.valid ? html`
-          <ha-alert alert-type="success">
-            ${localize('config.device_valid', this._language)}
-          </ha-alert>
-        ` : html`
-          <ha-alert alert-type="warning">
-            ${localize('config.device_invalid', this._language)} - ${localize('config.entities_missing', this._language, {
-              count: validation.missing.length,
-              total: validation.totalExpected
-            })}
-          </ha-alert>
-        `}
-        
-        <div class="device-info-details">
-          <h5>🔧 Device: ${validation.device?.name}</h5>
-          <div class="device-properties">
-            <div><strong>ID:</strong> ${validation.device?.id}</div>
-            <div><strong>Model:</strong> ${validation.device?.model}</div>
-            <div><strong>Manufacturer:</strong> ${validation.device?.manufacturer}</div>
-          </div>
-        </div>
-        
-        <div class="entity-status">
-          <div class="found-entities">
-            <h5>✅ Available (${validation.foundCount})</h5>
-            <ul>
-              ${validation.available.map(entity => html`
-                <li><code>${entity.entityId}</code></li>
-              `)}
-            </ul>
-          </div>
-          
-          ${validation.missing.length > 0 ? html`
-            <div class="missing-entities">
-              <h5>❌ Missing (${validation.missing.length})</h5>
-              <ul>
-                ${validation.missing.map(entity => html`
-                  <li><code>${entity.entityId}</code></li>
-                `)}
-              </ul>
-            </div>
-          ` : ''}
-        </div>
-      </div>
-    `;
-  }
 
   render() {
     if (!this.hass) {
@@ -482,9 +334,7 @@ export class TeddyCardEditor extends LitElement {
         
         ${this._isAutoMode() 
           ? this._renderAutoModeConfig() 
-          : this._isDeviceMode()
-            ? this._renderDeviceModeConfig()
-            : this._renderManualModeConfig()
+          : this._renderManualModeConfig()
         }
 
         <div class="form-group">
@@ -513,7 +363,7 @@ export class TeddyCardEditor extends LitElement {
             </ha-alert>
           ` : ''}
 
-          ${(this._toniebox_id && this._toniebox_name) || !this._isManualMode() ? html`
+          ${(this._toniebox_id && this._toniebox_name) || this._isAutoMode() ? html`
             <ha-alert alert-type="success">
               Configuration is valid! 🎉
             </ha-alert>
