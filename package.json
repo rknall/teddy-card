@@ -15,16 +15,16 @@
     "teddycloud",
     "hacs"
   ],
-  "author": "Your Name",
+  "author": "rknall",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/teddy-card.git"
+    "url": "https://github.com/rknall/teddy-card.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/teddy-card/issues"
+    "url": "https://github.com/rknall/teddy-card/issues"
   },
-  "homepage": "https://github.com/yourusername/teddy-card#readme",
+  "homepage": "https://github.com/rknall/teddy-card#readme",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.0",
     "@rollup/plugin-terser": "^0.4.0",

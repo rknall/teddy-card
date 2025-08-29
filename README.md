@@ -1,8 +1,8 @@
 # TeddyCloud Toniebox Card
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![GitHub Release](https://img.shields.io/github/release/yourusername/teddy-card.svg)](https://github.com/yourusername/teddy-card/releases)
-[![License](https://img.shields.io/github/license/yourusername/teddy-card.svg)](LICENSE.md)
+[![GitHub Release](https://img.shields.io/github/release/rknall/teddy-card.svg)](https://github.com/rknall/teddy-card/releases)
+[![License](https://img.shields.io/github/license/rknall/teddy-card.svg)](LICENSE.md)
 
 A custom Home Assistant card for displaying TeddyCloud Toniebox information with configurable parameters and multi-language support (English/German).
 
@@ -32,7 +32,7 @@ This card integrates with the [TeddyCloud Add-on](https://github.com/mrueg/addon
 1. Open HACS in your Home Assistant instance
 2. Navigate to "Frontend" section
 3. Click the three dots menu and select "Custom repositories"
-4. Add this repository URL: `https://github.com/yourusername/teddy-card`
+4. Add this repository URL: `https://github.com/rknall/teddy-card`
 5. Select "Lovelace" as the category
 6. Click "Add"
 7. Find "TeddyCloud Toniebox Card" in the HACS frontend list
@@ -41,7 +41,7 @@ This card integrates with the [TeddyCloud Add-on](https://github.com/mrueg/addon
 
 ### Manual Installation
 
-1. Download the latest `teddy-card.js` file from the [releases page](https://github.com/yourusername/teddy-card/releases)
+1. Download the latest `teddy-card.js` file from the [releases page](https://github.com/rknall/teddy-card/releases)
 2. Copy the file to your `config/www` directory
 3. Add the following to your `ui-lovelace.yaml` or through the UI:
 
@@ -164,7 +164,7 @@ If you see "Entity not found" errors:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/teddy-card.git
+git clone https://github.com/rknall/teddy-card.git
 cd teddy-card
 
 # Install dependencies
@@ -187,9 +187,9 @@ npm run watch
 
 ## Support
 
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/yourusername/teddy-card/issues)
-- 💡 **Feature Requests**: [GitHub Issues](https://github.com/yourusername/teddy-card/issues)
-- 📖 **Documentation**: [Wiki](https://github.com/yourusername/teddy-card/wiki)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/rknall/teddy-card/issues)
+- 💡 **Feature Requests**: [GitHub Issues](https://github.com/rknall/teddy-card/issues)
+- 📖 **Documentation**: [Wiki](https://github.com/rknall/teddy-card/wiki)
 
 ## Related Projects
 
@@ -210,5 +210,3 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 - HACS compatibility
 
 ---
-
-**Note**: Replace `yourusername` with your actual GitHub username in all URLs above before publishing.
