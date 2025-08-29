@@ -34,29 +34,17 @@ export class TeddyCard extends LitElement {
 
   static getStubConfig() {
     return {
-      toniebox_id: '12345678',
-      toniebox_name: 'My Toniebox',
-      language: 'en',
-      selection_mode: 'auto'
+      entity_source: '',
+      language: 'en'
     };
   }
 
   setConfig(config) {
-    // Handle backward compatibility - existing configs without selection_mode
+    // Handle backward compatibility and entity-based configuration
     const normalizedConfig = { ...config };
     
-    // If we have entity_source but no selection_mode, set to auto
-    if (normalizedConfig.entity_source && !normalizedConfig.selection_mode) {
-      normalizedConfig.selection_mode = 'auto';
-    }
-    
-    // If no selection_mode specified, default to auto for better UX
-    if (!normalizedConfig.selection_mode) {
-      normalizedConfig.selection_mode = 'auto';
-    }
-    
-    // Handle auto mode - extract IDs from entity_source
-    if (normalizedConfig.selection_mode === 'auto' && normalizedConfig.entity_source) {
+    // Extract IDs from entity_source if provided
+    if (normalizedConfig.entity_source) {
       const boxId = extractBoxIdFromEntity(normalizedConfig.entity_source);
       if (boxId) {
         normalizedConfig.toniebox_id = boxId;
@@ -64,33 +52,22 @@ export class TeddyCard extends LitElement {
       }
     }
     
-    // Validate based on mode
-    if (normalizedConfig.selection_mode === 'manual') {
-      if (!normalizedConfig.toniebox_id) {
-        throw new Error(localize('errors.missing_toniebox_id', normalizedConfig.language));
-      }
-      if (!normalizedConfig.toniebox_name) {
-        throw new Error(localize('errors.missing_toniebox_name', normalizedConfig.language));
-      }
-    } else if (normalizedConfig.selection_mode === 'auto') {
-      if (!normalizedConfig.entity_source && !normalizedConfig.toniebox_id) {
-        // Allow auto mode without entity_source for initial setup
-        console.log('Auto mode without entity source - will be configured in editor');
-      }
+    // Basic validation - require either entity_source or manual toniebox_id
+    if (!normalizedConfig.entity_source && !normalizedConfig.toniebox_id) {
+      console.log('Card needs configuration - please select an entity or enter Toniebox ID');
     }
     
     this.config = {
       language: 'en',
-      selection_mode: 'auto',
       ...normalizedConfig
     };
     
-    // Update name from entity if in auto mode and hass is available
+    // Update name from entity if available
     this._updateAutoDetectedName();
   }
   
   _updateAutoDetectedName() {
-    if (this.hass && this.config?.selection_mode === 'auto' && this.config?.entity_source) {
+    if (this.hass && this.config?.entity_source) {
       const entity = this.hass.states[this.config.entity_source];
       if (entity && !this.config.toniebox_name) {
         const name = extractDeviceName(entity, this.config.toniebox_id);

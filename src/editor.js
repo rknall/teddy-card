@@ -19,20 +19,14 @@ export class TeddyCardEditor extends LitElement {
   }
 
   setConfig(config) {
-    // Set defaults - prefer auto mode as primary
+    // Set defaults for simplified entity-based configuration
     this.config = { 
       toniebox_id: '',
       toniebox_name: '',
       language: 'en',
-      selection_mode: 'auto', // Default to auto mode 
       entity_source: '',
       ...config 
     };
-    
-    // Auto-detect if we have entity_source but no selection_mode
-    if (this.config.entity_source && !config.selection_mode) {
-      this.config.selection_mode = 'auto';
-    }
     
     this._selectedEntity = this.config.entity_source || '';
     this._updateAvailableDevices();
@@ -71,65 +65,25 @@ export class TeddyCardEditor extends LitElement {
     return this.config.language || 'en';
   }
 
-  get _selection_mode() {
-    return this.config.selection_mode || 'manual';
-  }
-
   get _entity_source() {
     return this.config.entity_source || '';
   }
 
-  _isAutoMode() {
-    return this._selection_mode === 'auto';
-  }
-
-  _isManualMode() {
-    return this._selection_mode === 'manual';
-  }
-
-  _onModeChange(ev) {
-    const newMode = ev.target.value;
-    
-    if (newMode === 'auto' && this._availableDevices && this._availableDevices.length > 0) {
-      // Auto-select first available device if switching to auto mode
-      const firstDevice = this._availableDevices[0];
-      const firstEntity = firstDevice?.sampleEntity;
-      
-      if (firstEntity) {
-        this._selectedEntity = firstEntity;
-        
-        try {
-          const autoConfig = createConfigFromEntity(this.hass, firstEntity);
-          this._updateConfig({
-            ...autoConfig,
-            selection_mode: 'auto',
-            language: this._language
-          });
-        } catch (error) {
-          console.warn('Could not auto-configure from entity:', error);
-        }
-      }
-    } else if (newMode === 'manual') {
-      this._updateConfig({
-        ...this.config,
-        selection_mode: 'manual',
-        entity_source: ''
-      });
-      this._selectedEntity = '';
-    }
-  }
 
   _onEntitySelect(ev) {
     const entityId = ev.target.value;
     this._selectedEntity = entityId;
     
-    if (entityId && this._isAutoMode()) {
+    if (entityId && this.hass) {
       try {
         const autoConfig = createConfigFromEntity(this.hass, entityId);
-        this._updateConfig({
-          ...autoConfig,
-          language: this._language
-        });
+        if (autoConfig) {
+          this._updateConfig({
+            ...this.config,
+            ...autoConfig,
+            language: this._language
+          });
+        }
       } catch (error) {
         console.error('Could not create config from entity:', error);
       }
@@ -163,6 +117,11 @@ export class TeddyCardEditor extends LitElement {
   }
 
   _updateConfig(newConfig) {
+    if (!newConfig) {
+      console.error('Cannot update with undefined config');
+      return;
+    }
+    
     const messageEvent = new Event('config-changed', {
       detail: { config: newConfig },
       bubbles: true,
@@ -171,48 +130,12 @@ export class TeddyCardEditor extends LitElement {
     this.dispatchEvent(messageEvent);
   }
 
-  _renderModeToggle() {
-    const hasEntityDevices = this._availableDevices && this._availableDevices.length > 0;
-    
-    return html`
-      <div class="mode-toggle">
-        <div class="toggle-container">
-          <ha-switch
-            .checked=${this._isAutoMode()}
-            .disabled=${!hasEntityDevices}
-            @change=${(ev) => this._onModeChange({target: {value: ev.target.checked ? 'auto' : 'manual'}})}
-          ></ha-switch>
-          <div class="toggle-label">
-            <strong>${localize('config.selection_mode', this._language)}</strong>
-            <div class="toggle-description">
-              ${this._isAutoMode() 
-                ? localize('config.mode_auto', this._language)
-                : localize('config.mode_manual', this._language)
-              }
-            </div>
-          </div>
-        </div>
-        
-        ${!hasEntityDevices ? html`
-          <ha-alert alert-type="warning">
-            ${localize('config.no_devices_found', this._language)}
-          </ha-alert>
-        ` : html`
-          <div class="devices-info">
-            ${localize('config.devices_found', this._language, { 
-              count: this._availableDevices.length 
-            })}
-          </div>
-        `}
-      </div>
-    `;
-  }
 
-  _renderAutoModeConfig() {
+  _renderEntityConfig() {
     const suggestedEntities = getSuggestedEntities(this.hass);
     
     return html`
-      <div class="auto-config">
+      <div class="entity-config">
         <div class="form-group">
           <ha-select
             label="${localize('config.entity_source', this._language)}"
@@ -240,40 +163,6 @@ export class TeddyCardEditor extends LitElement {
   }
 
 
-  _renderManualModeConfig() {
-    return html`
-      <div class="manual-config">
-        <div class="form-group">
-          <ha-textfield
-            label="${localize('config.toniebox_id', this._language)}"
-            .value=${this._toniebox_id}
-            .configValue=${'toniebox_id'}
-            @input=${this._valueChanged}
-            required
-            helper-text="${localize('config.toniebox_id_description', this._language)}"
-          ></ha-textfield>
-        </div>
-
-        <div class="form-group">
-          <ha-textfield
-            label="${localize('config.toniebox_name', this._language)}"
-            .value=${this._toniebox_name}
-            .configValue=${'toniebox_name'}
-            @input=${this._valueChanged}
-            required
-            helper-text="${localize('config.toniebox_name_description', this._language)}"
-          ></ha-textfield>
-        </div>
-
-        ${this._toniebox_id ? html`
-          <div class="validation-info">
-            <h4>${localize('config.entity_validation', this._language)}</h4>
-            ${this._renderEntityValidation()}
-          </div>
-        ` : ''}
-      </div>
-    `;
-  }
 
   _renderEntityValidation() {
     if (!this._toniebox_id) {
@@ -330,12 +219,7 @@ export class TeddyCardEditor extends LitElement {
 
     return html`
       <div class="card-config">
-        ${this._renderModeToggle()}
-        
-        ${this._isAutoMode() 
-          ? this._renderAutoModeConfig() 
-          : this._renderManualModeConfig()
-        }
+        ${this._renderEntityConfig()}
 
         <div class="form-group">
           <ha-select
@@ -351,23 +235,15 @@ export class TeddyCardEditor extends LitElement {
         </div>
 
         <div class="validation-summary">
-          ${(!this._toniebox_id && this._isManualMode()) ? html`
-            <ha-alert alert-type="error">
-              ${localize('errors.missing_toniebox_id', this._language)}
+          ${!this._selectedEntity ? html`
+            <ha-alert alert-type="info">
+              Please select a TeddyCloud entity to configure the card.
             </ha-alert>
-          ` : ''}
-          
-          ${(!this._toniebox_name && this._isManualMode()) ? html`
-            <ha-alert alert-type="error">
-              ${localize('errors.missing_toniebox_name', this._language)}
-            </ha-alert>
-          ` : ''}
-
-          ${(this._toniebox_id && this._toniebox_name) || this._isAutoMode() ? html`
+          ` : html`
             <ha-alert alert-type="success">
               Configuration is valid! 🎉
             </ha-alert>
-          ` : ''}
+          `}
         </div>
       </div>
     `;
@@ -419,9 +295,7 @@ export class TeddyCardEditor extends LitElement {
         font-weight: 500;
       }
 
-      .auto-config,
-      .manual-config,
-      .device-config {
+      .entity-config {
         background: var(--card-background-color);
         border-radius: 8px;
         padding: 16px;

@@ -208,8 +208,7 @@ export function createConfigFromEntity(hass, entityId) {
   return {
     entity_source: entityId,
     toniebox_id: boxId,
-    toniebox_name: deviceName,
-    selection_mode: 'auto'
+    toniebox_name: deviceName
   };
 }
 
