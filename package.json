@@ -1,0 +1,36 @@
+{
+  "name": "teddy-card",
+  "version": "1.0.0",
+  "description": "TeddyCloud Toniebox Card for Home Assistant",
+  "main": "dist/teddy-card.js",
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c --watch"
+  },
+  "keywords": [
+    "home-assistant",
+    "custom-card",
+    "toniebox",
+    "teddycloud",
+    "hacs"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/teddy-card.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/teddy-card/issues"
+  },
+  "homepage": "https://github.com/yourusername/teddy-card#readme",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-terser": "^0.4.0",
+    "rollup": "^4.0.0"
+  },
+  "dependencies": {
+    "lit": "^3.0.0"
+  }
+}
