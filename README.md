@@ -63,7 +63,7 @@ This card integrates with the [TeddyCloud Add-on](https://github.com/mrueg/addon
 2. Navigate to "Frontend" section
 3. Click the three dots menu and select "Custom repositories"
 4. Add this repository URL: `https://github.com/rknall/teddy-card`
-5. Select "Lovelace" as the category
+5. Select "Dashboard" as the category
 6. Click "Add"
 7. Find "TeddyCloud Toniebox Card" in the HACS frontend list
 8. Click "Install"
