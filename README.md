@@ -4,7 +4,7 @@
 [![GitHub Release](https://img.shields.io/github/release/rknall/teddy-card.svg)](https://github.com/rknall/teddy-card/releases)
 [![License](https://img.shields.io/github/license/rknall/teddy-card.svg)](LICENSE.md)
 
-A custom Home Assistant card for displaying TeddyCloud Toniebox information with configurable parameters and multi-language support (English/German).
+A smart Home Assistant card for TeddyCloud Toniebox integration with **automatic device discovery**, **visual entity selection**, and **intelligent configuration**. No more manual ID entry required!
 
 ## Screenshots
 
@@ -12,9 +12,13 @@ A custom Home Assistant card for displaying TeddyCloud Toniebox information with
 ![TeddyCloud Card](https://via.placeholder.com/600x400/03a9f4/ffffff?text=TeddyCloud+Toniebox+Card)
 *Example of the TeddyCloud Toniebox Card showing content, status, and controls*
 
-### Visual Editor  
-![Visual Editor](https://via.placeholder.com/600x300/4caf50/ffffff?text=Visual+Editor)
-*Easy configuration through the Home Assistant dashboard editor*
+### Smart Visual Editor  
+![Smart Visual Editor](https://via.placeholder.com/600x300/4caf50/ffffff?text=Smart+Visual+Editor)
+*Auto-discovery mode: Just select any Toniebox entity for instant configuration*
+
+### Manual Configuration Mode
+![Manual Configuration](https://via.placeholder.com/600x300/ff5722/ffffff?text=Manual+Configuration)
+*Traditional mode: Enter Toniebox ID and name manually (backward compatible)*
 
 ### Mobile View
 ![Mobile Responsive](https://via.placeholder.com/300x600/ff9800/ffffff?text=Mobile+View)
@@ -22,15 +26,27 @@ A custom Home Assistant card for displaying TeddyCloud Toniebox information with
 
 This card integrates with the [TeddyCloud Add-on](https://github.com/mrueg/addon-teddycloud) to provide a comprehensive overview of your Toniebox status, content, and server settings.
 
-## Features
+## ✨ Key Features
 
-- 📱 **Visual Interface**: Clean, responsive card design
-- 🎵 **Content Display**: Shows current content picture and title
-- 📊 **Status Information**: Battery, volume, and connection status
-- ⚡ **Interactive Elements**: Click entities for more information
-- 🌍 **Multi-language**: English and German support
-- ⚙️ **Visual Editor**: Easy configuration through the Home Assistant UI
-- 🎯 **HACS Compatible**: Install directly through HACS
+### 🧠 Smart Configuration (v1.1.0+)
+- **🔍 Auto-Discovery**: Automatically finds all TeddyCloud devices in your Home Assistant
+- **🎯 Entity Picker**: Select any Toniebox entity for instant configuration
+- **⚡ One-Click Setup**: No more guessing Toniebox IDs or manual entry
+- **✅ Real-Time Validation**: Shows which entities are available vs. missing
+- **🔄 Mode Toggle**: Switch between automatic and manual configuration
+
+### 📱 Card Features
+- **🎵 Content Display**: Current Tonie picture and title
+- **📊 Status Information**: Battery, charging, volume levels, and controls
+- **👆 Interactive Elements**: Click entities for detailed information
+- **📱 Responsive Design**: Perfect on desktop and mobile devices
+- **🌍 Multi-Language**: Full English and German support
+
+### 🛠️ Technical Features
+- **⚙️ Visual Editor**: Professional configuration interface with live validation
+- **🔄 Backward Compatible**: Existing configurations continue to work
+- **🎯 HACS Ready**: Easy installation and updates
+- **⚡ Performance Optimized**: Fast loading and smooth interactions
 
 ## Prerequisites
 
@@ -67,26 +83,53 @@ resources:
 
 4. Restart Home Assistant
 
-## Configuration
+## 🔧 Configuration
 
-### Using the Visual Editor
+The card offers **two configuration modes** for maximum flexibility:
 
-1. Enter edit mode on your dashboard
-2. Add a new card
-3. Search for "TeddyCloud Toniebox Card"
-4. Configure the required fields:
-   - **Toniebox ID**: The ID of your Toniebox (found in entity names)
-   - **Toniebox Name**: Display name for your Toniebox
-   - **Language**: Interface language (English/German)
+### 🚀 Quick Setup (Auto-Discovery Mode) - **Recommended**
 
-### Manual Configuration
+1. **Add the Card**: Dashboard → Edit → Add Card → "TeddyCloud Toniebox Card"
+2. **Enable Auto Mode**: Toggle the "Configuration Mode" switch to **ON** 
+3. **Select Entity**: Choose any Toniebox entity from the dropdown
+4. **Done!** ✨ Card automatically configures itself with your Toniebox information
+
+**Benefits**: No manual typing, instant setup, automatic entity discovery!
+
+### ⚙️ Advanced Setup (Manual Mode)
+
+Perfect for power users or when you need specific control:
+
+1. **Add the Card**: Dashboard → Edit → Add Card → "TeddyCloud Toniebox Card"
+2. **Keep Auto Mode OFF** (default for existing users)
+3. **Enter Details**:
+   - **Toniebox ID**: Found in your entity names (e.g., `12345678`)
+   - **Toniebox Name**: Your custom display name
+   - **Language**: English or German interface
+4. **Validate**: Check the entity validation section for missing entities
+
+### 📝 YAML Configuration
 
 ```yaml
+# Auto-discovery mode (recommended)
 type: custom:teddy-card
-toniebox_id: "12345678"  # Required: Your Toniebox ID
-toniebox_name: "My Toniebox"  # Required: Display name
-language: "en"  # Optional: 'en' or 'de', defaults to 'en'
+selection_mode: "auto"
+entity_source: "sensor.teddycloud_box_12345678_tag_valid"  # Any Toniebox entity
+language: "en"  # Optional: 'en' or 'de'
+
+# Manual mode (backward compatible)
+type: custom:teddy-card
+selection_mode: "manual"  # Optional: defaults to manual
+toniebox_id: "12345678"
+toniebox_name: "My Toniebox"
+language: "en"  # Optional: 'en' or 'de'
 ```
+
+### 🔄 Upgrading from v1.0.x
+
+Existing configurations **work automatically** - no changes needed! 
+- Your cards continue using manual mode
+- Switch to auto mode anytime for easier management
 
 ## Required Entities
 
@@ -143,34 +186,71 @@ Language can be set during configuration or changed later through the visual edi
 | Cache Cloud Content | Cloud-Inhalte zwischenspeichern |
 | Enable Cloud Operation | Cloud-Betrieb aktivieren |
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
-### Card Not Showing
+### 🚀 Quick Fixes (Try These First!)
 
-1. Check that HACS has installed the card correctly
-2. Verify that Home Assistant has been restarted after installation
-3. Check browser console for JavaScript errors
+**No TeddyCloud devices found in auto mode?**
+- ✅ Ensure [TeddyCloud Add-on](https://github.com/mrueg/addon-teddycloud) is running
+- ✅ Check Developer Tools → States for entities starting with `teddycloud_box_`
+- ✅ Switch to Manual Mode temporarily if needed
 
-### Missing Entities
+**Card not appearing in dashboard editor?**
+- ✅ Restart Home Assistant after HACS installation
+- ✅ Clear browser cache (Ctrl+F5)
+- ✅ Check if card appears in HACS → Frontend section
 
-If you see "Entity not found" errors:
+### 📊 Entity Validation Issues
 
-1. Verify that TeddyCloud is running and integrated with Home Assistant
-2. Check that your Toniebox ID is correct
-3. Ensure all required entities exist in Home Assistant
-4. Check the Developer Tools > States page for available entities
+The v1.1.0+ editor shows **real-time entity validation**:
 
-### Configuration Issues
+- **🟢 Green**: All entities found - perfect setup!
+- **🟡 Yellow**: Some entities missing - partial functionality
+- **🔴 Red**: Many entities missing - check TeddyCloud integration
 
-- **Toniebox ID**: This should match the ID used in your TeddyCloud entity names
-- **Toniebox Name**: This is just a display name and can be anything you like
-- **Language**: Must be either 'en' or 'de'
+**Common solutions:**
+1. **TeddyCloud not running**: Start the add-on
+2. **Wrong Toniebox ID**: Use auto-discovery mode instead
+3. **Integration issues**: Restart TeddyCloud add-on
 
-### Visual Editor Not Working
+### ⚙️ Configuration Problems
 
-1. Clear browser cache and refresh
-2. Check that you're using Home Assistant 2024.4.1 or newer
-3. Verify the card is properly installed through HACS
+**Auto-discovery mode issues:**
+- Use any TeddyCloud entity (sensor, binary_sensor, image, etc.)
+- The card extracts the Toniebox ID automatically
+- Switch modes if auto-detection fails
+
+**Manual mode issues:**
+- **Toniebox ID**: Find it in entity names (e.g., `teddycloud_box_12345678_*`)
+- **Entity format**: Must match exactly what TeddyCloud creates
+- **Case sensitive**: Use exact entity IDs from Developer Tools
+
+### 🎛️ Visual Editor Issues
+
+**Editor not loading:**
+1. Update to Home Assistant 2024.4.1+
+2. Clear browser cache completely
+3. Disable browser extensions temporarily
+4. Check browser console for errors (F12)
+
+**Toggle switch not working:**
+- Requires TeddyCloud entities to be detected
+- Try manual mode if auto-discovery fails
+- Refresh the page and try again
+
+### 🔄 Migration from v1.0.x
+
+**Existing cards not working after update:**
+- Cards should work automatically (backward compatible)
+- If issues occur, edit the card and save (no changes needed)
+- Check the validation section for any missing entities
+
+### 📱 Mobile Issues
+
+**Card not responsive on mobile:**
+- Update to latest version (v1.1.0+)
+- Clear mobile browser cache
+- Try landscape orientation for better entity validation view
 
 ## Development
 
@@ -214,13 +294,40 @@ npm run watch
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
-## Changelog
+## 📅 Changelog
 
-### v1.0.0
-- Initial release
-- Support for all TeddyCloud entities
-- Visual editor
-- Multi-language support (EN/DE)
-- HACS compatibility
+### v1.1.0 - Smart Entity Selection System (2025-01-XX)
+🎯 **Major Enhancement**: Transforms configuration from manual ID entry to intelligent device discovery!
+
+**🧠 New Smart Features:**
+- **🔍 Auto-Discovery**: Automatically finds all TeddyCloud devices in Home Assistant
+- **🎛️ Visual Entity Picker**: Select any Toniebox entity for instant configuration  
+- **⚡ One-Click Setup**: No more guessing Toniebox IDs
+- **🔄 Mode Toggle**: Switch between automatic and manual configuration
+- **✅ Real-Time Validation**: Shows which entities are available vs. missing with visual indicators
+
+**🎨 Enhanced User Experience:**
+- **🎯 Smart Editor**: Professional interface with live validation and entity counts
+- **📱 Improved Mobile**: Better responsive design for configuration on phones
+- **🌐 Extended Translations**: New German/English translations for all new features
+- **🚨 Better Error Messages**: Clear feedback for troubleshooting
+
+**🔧 Technical Improvements:**
+- **📦 New Architecture**: Modular utility functions for entity discovery and validation
+- **🔄 Backward Compatibility**: All existing configurations continue to work seamlessly
+- **⚡ Performance**: Optimized entity discovery and validation algorithms
+- **🛠️ Developer Experience**: Enhanced debugging and error handling
+
+**🎖️ Migration-Friendly:**
+- Zero breaking changes - existing cards work automatically
+- Optional upgrade to smart mode when editing cards
+- Fallback mechanisms for all edge cases
+
+### v1.0.0 - Initial Release (2024-XX-XX)
+- 🚀 Initial release with manual configuration
+- 🎵 Support for all TeddyCloud entities (content, status, controls)
+- ⚙️ Visual editor with basic configuration
+- 🌍 Multi-language support (English/German)
+- 🎯 HACS compatibility and validation
 
 ---
