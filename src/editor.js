@@ -78,11 +78,14 @@ export class TeddyCardEditor extends LitElement {
       try {
         const autoConfig = createConfigFromEntity(this.hass, entityId);
         if (autoConfig) {
-          this._updateConfig({
-            ...this.config,
+          // Ensure we have a valid base config to spread from
+          const baseConfig = this.config || { language: 'en' };
+          const newConfig = {
+            ...baseConfig,
             ...autoConfig,
             language: this._language
-          });
+          };
+          this._updateConfig(newConfig);
         }
       } catch (error) {
         console.error('Could not create config from entity:', error);
@@ -117,13 +120,19 @@ export class TeddyCardEditor extends LitElement {
   }
 
   _updateConfig(newConfig) {
-    if (!newConfig) {
-      console.error('Cannot update with undefined config');
+    if (!newConfig || typeof newConfig !== 'object') {
+      console.error('Cannot update with invalid config:', newConfig);
       return;
     }
     
+    // Ensure the config has required properties
+    const validatedConfig = {
+      language: 'en',
+      ...newConfig
+    };
+    
     const messageEvent = new Event('config-changed', {
-      detail: { config: newConfig },
+      detail: { config: validatedConfig },
       bubbles: true,
       composed: true,
     });

@@ -116,6 +116,56 @@ export class TeddyCard extends LitElement {
     `;
   }
 
+  _renderContentPicture(contentPictureEntity, lang) {
+    if (!contentPictureEntity) {
+      return html`<div class="picture-placeholder">
+        <ha-icon icon="mdi:teddy-bear"></ha-icon>
+        <span class="placeholder-text">No content loaded</span>
+      </div>`;
+    }
+
+    // Check if we have a valid image URL
+    const imageUrl = contentPictureEntity.attributes?.entity_picture;
+    if (!imageUrl) {
+      return html`<div class="picture-placeholder">
+        <ha-icon icon="mdi:teddy-bear"></ha-icon>
+        <span class="placeholder-text">No image available</span>
+      </div>`;
+    }
+
+    // Return image with error handling
+    return html`
+      <img 
+        src="${imageUrl}" 
+        alt="${localize('title', lang)}"
+        @error=${this._onImageError}
+        @load=${this._onImageLoad}
+      />
+      <div class="picture-placeholder" style="display: none;">
+        <ha-icon icon="mdi:teddy-bear"></ha-icon>
+        <span class="placeholder-text">Image failed to load</span>
+      </div>
+    `;
+  }
+
+  _onImageError(ev) {
+    console.warn('Content picture failed to load:', ev.target.src);
+    // Hide the failed image and show placeholder
+    ev.target.style.display = 'none';
+    const placeholder = ev.target.nextElementSibling;
+    if (placeholder && placeholder.classList.contains('picture-placeholder')) {
+      placeholder.style.display = 'flex';
+    }
+  }
+
+  _onImageLoad(ev) {
+    // Ensure placeholder is hidden when image loads successfully
+    const placeholder = ev.target.nextElementSibling;
+    if (placeholder && placeholder.classList.contains('picture-placeholder')) {
+      placeholder.style.display = 'none';
+    }
+  }
+
   _showMoreInfo(entityId) {
     const event = new Event('hass-more-info', {
       bubbles: true,
@@ -158,12 +208,7 @@ export class TeddyCard extends LitElement {
         <div class="card-content">
           <!-- Picture Section -->
           <div class="picture-section">
-            ${contentPictureEntity && contentPictureEntity.attributes.entity_picture
-              ? html`<img src="${contentPictureEntity.attributes.entity_picture}" alt="${localize('title', lang)}" />`
-              : html`<div class="picture-placeholder">
-                  <ha-icon icon="mdi:teddy-bear"></ha-icon>
-                </div>`
-            }
+            ${this._renderContentPicture(contentPictureEntity, lang)}
           </div>
 
           <!-- Content Title -->
@@ -245,16 +290,24 @@ export class TeddyCard extends LitElement {
 
       .picture-placeholder {
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         height: 150px;
         background: var(--divider-color);
         border-radius: 8px;
         color: var(--secondary-text-color);
+        gap: 8px;
       }
 
       .picture-placeholder ha-icon {
         --mdc-icon-size: 48px;
+      }
+
+      .placeholder-text {
+        font-size: 14px;
+        color: var(--secondary-text-color);
+        text-align: center;
       }
 
       .title-section {
